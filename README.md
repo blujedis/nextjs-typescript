@@ -1,7 +1,7 @@
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/800px-Nextjs-logo.svg.png" alt="Nextjs Logo" height="75" />
 
-Nextjs project using Typescript with modestly opinionated configuration to make real world Nextjs applications less cumbersome to spin up.
+Nextjs boilerplate using Typescript with modestly opinionated configuration to make real world Nextjs applications less cumbersome to spin up.
 
 ## Getting Started
 

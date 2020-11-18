@@ -15,6 +15,7 @@
   "suppressImplicitAnyIndexErrors": "true",
   "exclude": [
     "**/*+(e2e|spec|debug).ts*",
-    "**/example*"
+    "**/example*",
+    "**/node_modules*"
   ]
 }
