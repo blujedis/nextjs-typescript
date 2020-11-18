@@ -1,4 +1,4 @@
-import Providers from 'lib/providers';
+import Providers from 'providers';
 import { IApp } from 'types';
 
 // import App from 'next/app'

@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import Layout from 'lib/layout';
+import Layout from 'layout';
 
 const Privacy: FC<{ name?: string; }> = ({ name }) => {
 

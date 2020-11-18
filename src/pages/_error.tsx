@@ -1,5 +1,8 @@
 
-function Error({ statusCode }) {
+function Error(props) {
+
+  const { statusCode } = props;
+
   return (
     <p>
       {statusCode
@@ -7,6 +10,7 @@ function Error({ statusCode }) {
         : 'An error occurred on client'}
     </p>
   );
+
 }
 
 Error.getInitialProps = ({ res, err }) => {

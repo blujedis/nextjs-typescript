@@ -1,5 +1,5 @@
 
-import Layout from 'lib/layout';
+import Layout from 'layout';
 import { Page } from 'types';
 
 export default function Home(props: Page) {
@@ -12,6 +12,10 @@ export default function Home(props: Page) {
 
         <h1 className="title">
           Welcome to <a href="https://nextjs.org">Next.js!</a>
+          <br />
+          <p style={{ float: 'right', fontSize: '.9rem', marginTop: 8 }}>
+            With Typescript <img src="/images/ms-icon.png" width="20" style={{ verticalAlign: 'middle' }} />
+          </p>
         </h1>
 
         <p className="description">

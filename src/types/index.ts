@@ -1,6 +1,5 @@
 import { FC, Component } from 'react';
 import { Router } from 'next/router';
-import { InferGetStaticPropsType } from 'next';
 
 export type Page<Props extends Object = IPage> = Props & IPage;
 
