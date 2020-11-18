@@ -1,14 +1,15 @@
-import Head from 'next/head'
 
-export default function Home() {
+import Layout from 'lib/layout';
+import { Page } from 'types';
+
+export default function Home(props: Page) {
+
   return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
 
-      <main>
+    <Layout title="Create Next App" {...props}>
+
+      <>
+
         <h1 className="title">
           Welcome to <a href="https://nextjs.org">Next.js!</a>
         </h1>
@@ -43,56 +44,16 @@ export default function Home() {
             <h3>Deploy &rarr;</h3>
             <p>
               Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
+          </p>
           </a>
         </div>
-      </main>
 
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
-        </a>
-      </footer>
-
-      <style jsx>{`
+        <style jsx>{`
         .container {
           min-height: 100vh;
           padding: 0 0.5rem;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        footer img {
-          margin-left: 0.5rem;
-        }
-
-        footer a {
-          display: flex;
           justify-content: center;
           align-items: center;
         }
@@ -190,20 +151,73 @@ export default function Home() {
         }
       `}</style>
 
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
+      </>
 
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
-  )
+    </Layout>
+
+  );
+
 }
+
+//////////////////////////////////////////////////////////////////
+// getStaticProps
+//
+// When to use?
+//
+// Use this method which fires ONLY on the server side and is
+// not provided on the client, when you the data needed
+// is not specific to a user as it will be cached.
+// 
+//////////////////////////////////////////////////////////////////
+
+// InferGetStaticPropsType<typeof getStaticProps>
+// OR:
+// props: GetStaticProps
+// 
+// This would be written as:
+// function Home(props: Page<InferGetStaticPropsType<typeof getStaticProps>>) {
+//    return (
+//       <p>Hello World</>
+//    );
+// }
+
+// export async function getStaticProps() {
+//   return {
+//     props: {}
+//   };
+// };
+
+
+
+//////////////////////////////////////////////////////////////////
+// getServerSideProps
+// 
+// When to use?
+//
+// Use this method when you need to pre-render on each 
+// request of the page. For example user specific data.
+// If possible load data on the client side as this method
+// may be slower than "getStaticProps" above.
+// 
+//////////////////////////////////////////////////////////////////
+
+// InferGetServerSidePropsType<typeof getStaticProps> 
+// OR:
+// props: GetServerSideProps
+// 
+// This would be written as:
+// function Home(props: Page<InferGetServerSidePropsType<typeof getServerSideProps>>) {
+//    return (
+//       <p>Hello World</>
+//    );
+// }
+
+// export async function getServerSideProps(context) {
+//   return {
+//     props: {}, // will be passed to the page component as props
+//   }
+// }
+
+
+
+

@@ -5,11 +5,22 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "docs": "typedoc . --options ./typedoc.json --out ./docs && touch ./docs/.nojekyll"
   },
   "dependencies": {
     "next": "^10.0.0",
+    "next-connect": "^0.9.1",
+    "nprogress": "^0.2.0",
     "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react-dom": "16.13.1",
+    "restash": "^0.1.22"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.7",
+    "@types/nprogress": "^0.2.0",
+    "@types/react": "^16.9.56",
+    "typedoc": "^0.19.2",
+    "typescript": "^4.0.5"
   }
 }
