@@ -9,18 +9,25 @@
     "docs": "typedoc . --options ./typedoc.json --out ./docs && touch ./docs/.nojekyll"
   },
   "dependencies": {
+    "camelize": "^1.0.0",
+    "decamelize": "^4.0.0",
+    "global": "^4.4.0",
+    "md5": "^2.3.0",
     "next": "^10.0.0",
     "next-connect": "^0.9.1",
     "nprogress": "^0.2.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "restash": "^0.1.22"
+    "restash": "^0.1.22",
+    "statuses": "^2.0.0"
   },
   "devDependencies": {
+    "@types/md5": "^2.2.1",
     "@types/node": "^14.14.7",
     "@types/nprogress": "^0.2.0",
     "@types/react": "^16.9.56",
+    "@types/statuses": "^2.0.0",
     "typedoc": "^0.19.2",
-    "typescript": "^4.0.5"
+    "typescript": "^4.2.0-dev.20201117"
   }
 }

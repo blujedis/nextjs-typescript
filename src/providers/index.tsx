@@ -17,6 +17,7 @@ function Preflight(props: PropsWithChildren<any>) {
 
   return (
     <StoreProvider>
+      <ProgressBar />
       {children}
     </StoreProvider>
   );

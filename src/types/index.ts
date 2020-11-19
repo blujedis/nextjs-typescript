@@ -1,22 +1,13 @@
-import { FC, Component } from 'react';
+import { FC, Component, ReactElement } from 'react';
 import { Router } from 'next/router';
 
-export type Page<Props extends Object = IPage> = Props & IPage;
+export type ErrorProps<Ext extends { statusCode?: number } = { statusCode?: number; }> = Error & Ext;
 
-export interface IApp {
+export type PageProps<P = {}> = { err?: ErrorProps } & P;
+
+export interface IApp<P extends Object = {}> {
   Component: FC | typeof Component;
-  err: Error;
-  pageProps: Object;
+  err: ErrorProps;
+  pageProps: P;
   router: Router;
-}
-
-export interface ILayout {
-  name?: string;
-  title?: string;
-  subtitle?: string;
-}
-
-export interface IPage {
-  err?: Error;
-  router?: Router;
 }

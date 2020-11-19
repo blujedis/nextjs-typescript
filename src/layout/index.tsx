@@ -1,19 +1,14 @@
 import { PropsWithChildren } from 'react';
 import LayoutDefault from './default';
 import LayoutFull from './full';
-
-export interface ILayout {
-  name?: string;
-  title?: string;
-  subtitle?: string;
-}
+import { ILayoutBase } from './types';
 
 const LAYOUT_MAP = {
   default: LayoutDefault,
   full: LayoutFull
 };
 
-function Layout(props: PropsWithChildren<ILayout>) {
+function Layout(props: PropsWithChildren<ILayoutBase>) {
 
   props = {
     name: 'default',
@@ -25,7 +20,7 @@ function Layout(props: PropsWithChildren<ILayout>) {
   if (!LayoutComponent)
     throw new Error(`Invalid Layout name "${props.name || 'unknown'}".`);
 
-  return <LayoutComponent  {...props} />;
+  return <LayoutComponent {...props} />;
 
 }
 

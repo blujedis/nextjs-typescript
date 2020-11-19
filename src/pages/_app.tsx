@@ -3,10 +3,10 @@ import { IApp } from 'types';
 
 // import App from 'next/app'
 function App(props: IApp) {
-  const { Component, pageProps, err, router } = props;
+  const { Component, pageProps, err } = props;
   return (
     <Providers>
-      <Component err={err} router={router} {...pageProps} />
+      <Component err={err} {...pageProps} />
     </Providers>
   );
 }

@@ -1,8 +1,8 @@
-
 import Layout from 'layout';
-import { Page } from 'types';
+import { PageProps } from 'types';
+import initRoles from 'utils/roles';
 
-export default function Home(props: Page) {
+function Home(props: PageProps) {
 
   return (
 
@@ -163,6 +163,9 @@ export default function Home(props: Page) {
 
 }
 
+
+export default Home;
+
 //////////////////////////////////////////////////////////////////
 // getStaticProps
 //
@@ -190,7 +193,6 @@ export default function Home(props: Page) {
 //     props: {}
 //   };
 // };
-
 
 
 //////////////////////////////////////////////////////////////////

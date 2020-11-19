@@ -1,8 +1,8 @@
 import { PropsWithChildren } from 'react';
 import Head from 'next/head';
-import { ILayout } from '.';
+import { ILayout } from './types';
 
-function LayoutFull(props: PropsWithChildren<Omit<ILayout, 'name'>>) {
+function LayoutFull(props: PropsWithChildren<ILayout>) {
 
   const { title, children } = props;
 
