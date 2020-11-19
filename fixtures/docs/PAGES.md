@@ -10,7 +10,7 @@ You can read more about the [pages directory here](https://nextjs.org/docs/basic
 
 This directory contains useful examples, once you are done just move the directory out of the pages directory and they will no longer be routeable.
 
-<table>
+<table width="100%">
   <thead>
     <tr><th>Link</th><th>Description</th></tr>
   </thead>
