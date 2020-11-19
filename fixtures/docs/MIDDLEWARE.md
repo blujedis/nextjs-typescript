@@ -1,6 +1,6 @@
-## NextJS Typescript (MIDDLEWARE)
-
+## NextJS Typescript - Middleware
 <a href="MAIN.md">&larr; MENU</a>
+<br/><br/>
 
 The "Middleware" directory is where we define helpers to extend the stack when defining api routes.
 

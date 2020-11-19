@@ -1,6 +1,6 @@
-## NextJS Typescript (PROVIDERS)
-
+## NextJS Typescript - Providers
 <a href="MAIN.md">&larr; MENU</a>
+<br/><br/>
 
 The "Providers" directory is where various Context Providers and the like will be initialized. All providers are then imported and bootstrapped in the **preflight.ts** file.
 
