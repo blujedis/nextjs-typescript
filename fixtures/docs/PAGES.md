@@ -1,6 +1,12 @@
-<div style="margin-bottom: 1rem;">
-  <div style="display: inline-block; width: 49%;"><h2>NextJS Typescript</h2><span style="color: gray;">Pages</span></div>
-  <div style="display: inline-block; text-align: right; width: 49%;"><a href="MAIN.md">&larr; MENU</a></div>
+<style>
+  .header {
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+<div class="header">
+  <div><h2>NextJS Typescript</h2><span style="color: gray;">Pages</span></div>
+  <div><a href="MAIN.md">&larr; MENU</a></div>
 </div>
 
 The "Pages" directory is the default directory provided by [NextJS](http://nextjs.org) where all pages are created. These pages result in auto generated routes.
