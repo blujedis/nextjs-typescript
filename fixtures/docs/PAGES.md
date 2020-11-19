@@ -1,6 +1,4 @@
-## NextJS Typescript (PAGES)
-
-<a href="MAIN.md">&larr; MENU</a>
+<h2>NextJS Typescript (PAGES)</h2> <a href="MAIN.md" style="float: right; clear: both;">&larr; MENU</a>
 
 The "Pages" directory is the default directory provided by [NextJS](http://nextjs.org) where all pages are created. These pages result in auto generated routes.
 
