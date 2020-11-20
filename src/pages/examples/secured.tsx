@@ -8,7 +8,7 @@ function Secured(props: PageProps) {
   return (
     <Layout title="Create Next App" {...props}>
       <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.5rem' }}>
-        If you see this, the Guard component isn't working!!
+        If you see this, the Secured Guard component isn't working!!
       </p>
     </Layout>
   );

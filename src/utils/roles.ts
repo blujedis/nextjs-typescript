@@ -123,14 +123,17 @@ export default function roleManager<M>(initMap: M) {
    * Gets the array of roles at a specified key and then normalizes.
    * 
    * @param role the role key to get.   
+   * @param include when true include itself otherwise just get child roles.
    */
-  function getRole(role: Role) {
+  function getRole(role: Role, include = true) {
     if (role === '*')
       return ['*'] as Role[];
     if (!MAP[role as any])
       return null;
-    // Always include the role itself. We'll filter dupes.
-    return dedupe([...(MAP[role as any] || [] as any), role]);
+    const roles = [...(MAP[role as any] || [])] as Role[];
+    if (include)
+      roles.push(role);
+    return roles;
   }
 
   /**
@@ -149,18 +152,13 @@ export default function roleManager<M>(initMap: M) {
   * @param roles the roles to be cascaded.
   */
   function cascade(...roles: (Role | Role[])[]): Role[] {
-    roles = flatten(roles);
     if (!roles.length)
       return roles as Role[];
-    const allRoles = (roles as Role[]).map(getRole);
-    console.log(allRoles);
-    return allRoles.reduce((a, c) => {
-      c.forEach(r => {
-        if (r && !a.includes(r))
-          a.push(r);
-      });
-      return a;
-    }, [] as Role[]);
+    roles = Array.isArray(roles[0]) ? roles[0] : roles;
+    const allRoles = flatten((roles as Role[]).map(role => {
+      return flatten(getRole(role).map(getRole as any));
+    })) as unknown as Role[];
+    return dedupe(allRoles);
   }
 
   /**
@@ -170,7 +168,7 @@ export default function roleManager<M>(initMap: M) {
    * @param allowed array or allowed roles to be authorized.
    * @param compare array of roles to compare to required.
    */
-  function authorize(allowed: Role | Role[], compare: Role | Role[]) {
+  function authorize(allowed: Role | Role[], compare: Role | Role[] = []) {
 
     const api = {
       _allowAnon: false,       // this is useful when compare might be empty.
@@ -178,13 +176,34 @@ export default function roleManager<M>(initMap: M) {
       _excluded: [] as Role[],  // compare roles that may not be present.
       _required: ensureArray(allowed) as Role[],
       _compare: ensureArray(compare) as Role[],
-      strict: () => api._strict = true,
-      exclude: (excluded: Role | Role[]) => api._excluded = ensureArray(excluded) as Role[],
-      allowAnon: () => api._allowAnon = true,
-      verify
+      strict: () => {
+        api._strict = true;
+        return api;
+      },
+      exclude: (excluded: Role | Role[]) => {
+        api._excluded = ensureArray(excluded) as Role[];
+        return api;
+      },
+      allowAnon: () => { api._allowAnon = true; return api; },
+      verify,
+      verifyWithStatus,
+      verifyUnauthorized,
+      verifyForbidden
     };
 
-    function verify() {
+    /**
+     * Verify specifying optional status code to return on failure.
+     * 
+     * @param failStatus 
+     * @param successStatus 
+     */
+    function verify(failStatus: number, successStatus?: number): number;
+
+    /**
+     * Verifies the user suppied roles, returns boolean if verified or not.
+     */
+    function verify(): boolean;
+    function verify(failStatus?: number, successStatus?: number) {
 
       // If no compare length but allowAnon enabled 
       // then let'em through.
@@ -199,12 +218,49 @@ export default function roleManager<M>(initMap: M) {
         api._compare = cascade(api._compare);
       }
 
+      const valid = hasAnyRole(allowed, compare);
+
       // Check if user compare roles exist in allowed roles.
-      return hasAnyRole(allowed, compare);
+      if (!failStatus && !successStatus)
+        return valid;
+
+      failStatus = failStatus || 401;
+      successStatus = successStatus || 200;
+
+      if (valid)
+        return successStatus;
+
+      return failStatus;
 
     }
 
-    return api;
+    /**
+     * Verifies the user roles if failed returns 401 otherwise 200.
+     * 
+     * @param failStatus the failed status code (default: 401).
+     * @param successStatus the success status code (default: 200).
+     */
+    function verifyWithStatus(failStatus = 401, successStatus = 200) {
+      return verify(failStatus, successStatus);
+    }
+
+    /**
+     * Verifies the user roles, if failed returns 401 status code.
+     * Otherwise 200 will be returned.
+     */
+    function verifyUnauthorized() {
+      return verifyWithStatus(401);
+    }
+
+    /**
+     * Verifies the user roles, if failed returns 403 status code.
+     * Otherwise 200 will be returned.
+     */
+    function verifyForbidden() {
+      return verifyWithStatus(403);
+    }
+
+    return api as unknown as Omit<typeof api, '_allowAnon' | '_strict' | '_excluded' | '_required' | '_compare'>;
 
   }
 
