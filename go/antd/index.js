@@ -21,7 +21,9 @@ module.exports = ({ prefix }) => {
     name: label,
     alias: [],
     args: [],
-    action,
+    add,
+    remove,
+    update,
     description: `Installs React ${label} library.`,
     flags: {
       // '--help': { alias: '-h', description: 'display help menu for command' }

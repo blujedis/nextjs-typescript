@@ -56,7 +56,9 @@ module.exports = ({ prefix }) => {
     name: label,
     alias: [],
     args: [],
-    action,
+    add,
+    remove,
+    update,
     description: `Displays help menu.`,
     flags: {
       '--help': { alias: '-h', description: 'Displays help menu for command.' }

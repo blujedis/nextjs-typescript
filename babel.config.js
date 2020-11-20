@@ -5,5 +5,12 @@
  * If not just leave it be or you can delete if you wish.
  */
 module.exports = {
-  presets: ['next/babel']
+  presets: ['next/babel'],
+  plugins: [
+    "import",
+    {
+      "libraryName": "antd",
+      "style": true
+    }
+  ]
 };

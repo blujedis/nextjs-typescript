@@ -1,7 +1,6 @@
-const commands = require('./commands');
+const { commandKey, command, showHelp, runAction } = require('./commands');
 
 if (commandKey === 'help' || (argv.h || argv.help)) {
-  const command = commands[commandKey];
 
   if (!command)
     return console.error(colors.redBright(`\nCould NOT show help for unknown command ${commandKey}.\n`));
@@ -15,6 +14,6 @@ if (commandKey === 'help' || (argv.h || argv.help)) {
 }
 
 if (commandKey) {
-  runAction(commands[commandKey]);
+  runAction(command);
   return;
 }

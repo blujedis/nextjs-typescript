@@ -50,7 +50,9 @@ module.exports = ({ prefix }) => {
     name: label,
     alias: [],
     args: [],
-    action,
+    add,
+    remove,
+    update,
     description: `installs React ${label} library.`,
     flags: {
       '--force': { description: 'force install' }

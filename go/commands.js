@@ -5,6 +5,7 @@ const utils = require('./utils');
 const colors = require('ansi-colors');
 const prefix = 'yarn go';
 const commandKey = argv._[0];
+const subCommandKey = argv._[1];
 const name = 'Go Tools';
 const description = 'Addon Manager for Nextjs Typescript';
 const spacer = `  `;
@@ -186,16 +187,17 @@ function normalize(commands) {
 
 function runAction(command) {
 
-  if (!command && aliasMap[commandKey])
-    command = commands[aliasMap[commandKey]];
-
   if (!command)
     return console.error(colors.redBright(`\nFailed to lookup command ${commandKey}, try ${prefix} help for commands.\n`));
 
   if (!command.action)
     return console.error(colors.redBright(`\nCommand ${commandKey} is missing required action.\n`));
 
-  command.action({ argv, colors, table: createTable, command, commands, utils });
+  const subcommand = command[subCommandKey];
+
+  console.log(subcommand);
+
+  // command.action({ argv, colors, table: createTable, command, commands, utils });
 
 }
 
@@ -204,11 +206,14 @@ function showHelp(command) {
   process.exit();
 }
 
+const command = commands[commandKey] || commands[aliasMap[commandKey]];
+
 module.exports = {
   argv,
   commandKey,
   runAction,
   showHelp,
-  commands
+  commands,
+  command
 };
 
