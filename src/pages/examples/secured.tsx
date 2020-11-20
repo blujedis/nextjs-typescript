@@ -2,7 +2,7 @@ import Layout from 'layout';
 import Link from 'next/link';
 import { CSSProperties } from 'react';
 import { PageProps } from 'types';
-import withGuard from 'with/withGuard';
+import withGuard from 'components/with/withGuard';
 
 function Secured(props: PageProps) {
   return (

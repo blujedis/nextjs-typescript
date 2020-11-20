@@ -15,6 +15,5 @@ Click below on any link which corresponds to the project's directory structure. 
      <tr><td><a href="PROVIDERS.md" >Providers</a></td><td>Directory containing context related providers exposed to app stack.</td></tr>
      <tr><td><a href="TYPES.md" >Types</a></td><td>Global Typescript types.</td></tr>
      <tr><td><a href="UTILS.md" >Utils</a></td><td>Useful helpers uses in just about every app/site.</td></tr>
-     <tr><td><a href="WITH.md" >With</a></td><td>Directory containing Page Component wrapper helpers.</td></tr>
   </tbody>
 </table>

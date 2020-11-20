@@ -1,6 +1,6 @@
 import Layout from 'layout';
 import { PageProps } from 'types';
-import withGuard from 'with/withGuard';
+import withGuard from 'components/with/withGuard';
 import initRoles, { RoleKey } from 'utils/roles';
 
 function Roles(props: PageProps) {

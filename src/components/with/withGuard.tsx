@@ -1,7 +1,7 @@
 import Redirect, { IRedirectProps } from 'components/redirect';
 import { GetServerSidePropsContext, NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
-import { withFallback, getWithServerSideProps, IWithFallback, IServerSidePropsResult } from 'with/withFallback';
+import { withFallback, getWithServerSideProps, IWithFallback, IServerSidePropsResult } from 'components/with/withFallback';
 import { isString, isPlainObject, isPromise } from 'utils/is';
 import { ErrorProps } from 'types';
 import { sanitizeObject, serializeError } from 'utils/object';
