@@ -1,6 +1,6 @@
 {
+  "packageManager": "yarn",
   "enabled": [
-    "antd",
     "bulma"
   ]
 }

@@ -1,15 +1,17 @@
 const gofig = require('./config.json');
+const pkg = require('../package.json');
 const argv = require('minimist')(process.argv.slice(2));
 const { table, getBorderCharacters } = require('table');
 const utils = require('./utils');
 const colors = require('ansi-colors');
-const prefix = 'yarn go';
+const prefix = `${gofig.packageManager} go`;
 const commandKey = argv._[0];
 const subCommandKey = argv._[1];
 const name = 'Go Tools';
 const description = 'Addon Manager for Nextjs Typescript';
 const spacer = `  `;
 
+const { packageManager } = gofig;
 const { ensureArray } = utils;
 
 // Base table configuration for menu.
@@ -161,8 +163,6 @@ function normalize(commands) {
         flags: [],
         examples: []
       },
-      installPath: '',
-      packages: [],
       ...command
     };
 
@@ -190,14 +190,12 @@ function runAction(command) {
   if (!command)
     return console.error(colors.redBright(`\nFailed to lookup command ${commandKey}, try ${prefix} help for commands.\n`));
 
-  if (!command.action)
-    return console.error(colors.redBright(`\nCommand ${commandKey} is missing required action.\n`));
+  const subCommand = command[subCommandKey];
 
-  const subcommand = command[subCommandKey];
+  if (!subCommand)
+    return console.error(colors.redBright(`\nCommand ${commandKey} is missing required action ${subCommandKey}.\n`));
 
-  console.log(subcommand);
-
-  // command.action({ argv, colors, table: createTable, command, commands, utils });
+  subCommand({ argv, colors, table: createTable, command, commands, utils, packageManager, gofig, pkg });
 
 }
 

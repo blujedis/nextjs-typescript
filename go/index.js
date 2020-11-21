@@ -1,4 +1,4 @@
-const { commandKey, command, showHelp, runAction } = require('./commands');
+const { commandKey, command, showHelp, runAction, argv } = require('./commands');
 
 if (commandKey === 'help' || (argv.h || argv.help)) {
 
