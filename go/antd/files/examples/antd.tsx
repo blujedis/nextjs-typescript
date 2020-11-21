@@ -1,5 +1,4 @@
 import { Layout, Menu, Breadcrumb } from 'antd';
-import 'antd/dist/antd.less';
 
 const { Header, Sider, Footer, Content } = Layout;
 

@@ -1,6 +1,4 @@
 {
   "packageManager": "yarn",
-  "enabled": [
-    "bulma"
-  ]
+  "enabled": []
 }

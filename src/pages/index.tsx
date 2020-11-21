@@ -1,6 +1,5 @@
 import Layout from 'layout';
 import { PageProps } from 'types';
-import initRoles from 'utils/roles';
 
 function Home(props: PageProps) {
 

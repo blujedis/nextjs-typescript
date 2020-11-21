@@ -4,6 +4,8 @@ const CWD = process.cwd();
 
 const label = 'antd';
 
+const appSrc = join(CWD, 'src/pages/_app.tsx');
+
 const examplesSrc = join(__dirname, 'files/examples');
 const examplesDest = join(CWD, 'src/pages/examples/addons');
 const examplesInsalledDest = join(examplesDest, 'antd.tsx')
@@ -13,6 +15,7 @@ const blueprintsDest = join(CWD, 'src/addons/antd');
 
 const pkgs = ['antd']
 const devPkgs = ['@zeit/next-less', '@zeit/next-css', 'next-compose-plugins', '-D'];
+const importStatement = "import 'antd/dist/antd.less'";
 
 async function add({ args, colors, table, command, commands, utils, packageManager, gofig, pkg }) {
 
@@ -24,31 +27,30 @@ async function add({ args, colors, table, command, commands, utils, packageManag
 
   try {
 
-
-    const mPkgs = await utils.run(packageManager, ['add', ...pgks]);
+    const mPkgs = await utils.run(packageManager, ['add', ...pkgs]);
 
     if (mPkgs.code !== 0)
       return;
-    console.log(colors.greenBright('success'), `Antd dependency packages installed successfully.`);
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} dependency packages installed successfully.`);
 
     const dPkgs = await utils.run(packageManager, ['add', ...devPkgs]);
 
     if (dPkgs.code !== 0)
       return;
-    console.log(colors.greenBright('success'), `Antd development dependencies insalled successfully.`);
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} development dependencies insalled successfully.`);
 
     if (utils.existsSync(blueprintsSrc)) {
-      const bprints = await utils.copyDirectory(blueprintsSrc, blueprintsDest);
+      const bprints = await utils.copy(blueprintsSrc, blueprintsDest);
       if (bprints.code !== 0)
         return;
-      console.log(colors.greenBright('success'), `Antd blueprints copied to /addons/antd.`);
+      console.log(colors.greenBright('success'), `${utils.capitalize(label)} blueprints copied to /addons/${label}.`);
     }
 
     if (utils.existsSync(examplesSrc)) {
-      const dirs = await utils.copyDirectory(examplesSrc, examplesDest);
+      const dirs = await utils.copy(examplesSrc, examplesDest);
       if (dirs.code !== 0)
         return;
-      console.log(colors.greenBright('success'), `Antd examples copied to /pages/examples/addons.`);
+      console.log(colors.greenBright('success'), `${utils.capitalize(label)} examples copied to /pages/examples/addons.`);
     }
 
     // update jest config in package.json
@@ -56,14 +58,25 @@ async function add({ args, colors, table, command, commands, utils, packageManag
     const pkgResult = await utils.savePackage(pkg);
     if (pkgResult.code !== 0)
       return;
-    console.log(colors.greenBright('success'), `Antd updated package.json with Jest configuration.`);
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} updated package.json with Jest configuration.`);
+
+    let appFile = await utils.readFile(appSrc);
+    if (!appFile)
+      return;
+    appFile = utils.fileImportAdd(appFile, importStatement);
+
+    const appFileWrite = await utils.writeFile(appSrc, appFile);
+
+    if (appFileWrite.code !== 0)
+      return;
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} updated _app.tsx import statement.`);
 
     // if we get here set config to enabled.
 
-    const cfg = await utils.setAddonEnabled(gofig, 'antd', true);
+    const cfg = await utils.setAddonEnabled(gofig, label, true);
     if (cfg.code !== 0)
       return;
-    console.log(colors.greenBright('success'), `Antd enabled, be sure to restart Nextjs with "${packageManager} dev".`);
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} enabled, be sure to restart Nextjs with "${packageManager} dev".`);
 
   }
   catch (err) {
@@ -80,37 +93,57 @@ async function remove({ args, colors, table, command, commands, utils, packageMa
   // errors for missing packages.
 
   const mPkgs = await utils.run(packageManager, ['remove', ...pkgs]);
-  console.log(colors.greenBright('success'), `Antd dependency packages REMOVED successfully.`);
+  console.log(colors.greenBright('success'), `${utils.capitalize(label)} dependency packages REMOVED successfully.`);
 
-  const dPkgs = await utils.run(packageManager, ['remove', ...devPkgs]);
-  console.log(colors.greenBright('success'), `Antd development dependencies REMOVED successfully.`);
+  const dPkgs = await utils.run(packageManager, ['remove', ...devPkgs].filter(p => p !== 'next-compose-plugins'));
+  console.log(colors.greenBright('success'), `${utils.capitalize(label)} development dependencies REMOVED successfully.`);
 
-  if (hasBlueprintsDest.length && utils.existsSync(blueprintsSrc)) {
-    const bprints = await utils.unlinkDirectory(blueprintsDest);
-    if (bprints.code !== 0)
+  try {
+
+    if (hasBlueprintsDest.length && utils.existsSync(blueprintsSrc)) {
+      const bprints = await utils.remove(blueprintsDest);
+      if (bprints.code !== 0)
+        return;
+      console.log(colors.greenBright('success'), `${utils.capitalize(label)} blueprints REMOVED from /addons/${label}.`);
+    }
+
+    if (utils.existsSync(examplesInsalledDest)) {
+      const dirs = await utils.remove(examplesInsalledDest);
+      if (dirs.code !== 0)
+        return;
+      console.log(colors.greenBright('success'), `${utils.capitalize(label)} examples REMOVED from /pages/examples/addons/${label}.tsx.`);
+    }
+
+    delete pkg.jest;
+    const pkgResult = await utils.savePackage(pkg);
+    if (pkgResult.code !== 0)
       return;
-    console.log(colors.greenBright('success'), `Antd blueprints REMOVED from /addons/antd.`);
-  }
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} updated package.json REMOVED Jest configuration.`);
 
-  if (utils.existsSync(examplesInsalledDest)) {
-    const dirs = await utils.unlinkDirectory(examplesInsalledDest);
-    if (dirs.code !== 0)
+    let appFile = await utils.readFile(appSrc);
+    if (!appFile)
       return;
-    console.log(colors.greenBright('success'), `Antd examples REMOVED from /pages/examples/addons/antd.tsx.`);
+    appFile = utils.fileImportRemove(appFile, importStatement, false);
+
+    const appFileWrite = await utils.writeFile(appSrc, appFile);
+
+    if (appFileWrite.code !== 0)
+      return;
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} REMOVED _app.tsx import statement ${importStatement}.`);
+
+
+    const cfg = await utils.setAddonDisabled(gofig, label, true);
+    if (cfg.code !== 0)
+      return;
+    console.log(colors.greenBright('success'), `${utils.capitalize(label)} DISABLED, be sure to restart Nextjs with "${packageManager} dev".`);
+
+    console.log(`\n${colors.yellow('NOTE: some directories may need to be removed manually!\n')}`);
+
+
   }
-
-  delete pkg.jest;
-  const pkgResult = await utils.savePackage(pkg);
-  if (pkgResult.code !== 0)
-    return;
-  console.log(colors.greenBright('success'), `Antd updated package.json REMOVED Jest configuration.`);
-
-  const cfg = await utils.setAddonDisabled(gofig, 'antd', true);
-  if (cfg.code !== 0)
-    return;
-  console.log(colors.greenBright('success'), `Antd DISABLED, be sure to restart Nextjs with "${packageManager} dev".`);
-
-  console.log(`\n${colors.yellow('NOTE: some directories may need to be removed manually!\n')}`);
+  catch (err) {
+    console.error(colors.redBright(`\n${err.stack}\n`));
+  }
 
 }
 
@@ -139,14 +172,6 @@ module.exports = ({ prefix }) => {
   return config;
 
 };
-
-// add to package.json
-// {
-//   "jest": {
-//     "transformIgnorePatterns": [
-//       "/node_modules/(?!antd|@ant-design|rc-.+?|@babel/runtime).+(js|jsx)$"
-//     ]
-// }
 
 // Babel-plugin-import still needed?
 // "import",
