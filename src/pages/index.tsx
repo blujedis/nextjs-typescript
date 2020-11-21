@@ -1,4 +1,5 @@
 import Layout from 'layout';
+import Link from 'next/link';
 import { PageProps } from 'types';
 
 function Home(props: PageProps) {
@@ -19,6 +20,9 @@ function Home(props: PageProps) {
 
         <p className="description">
           Get started by editing <code>pages/index.js</code>
+        </p>
+        <p>
+          <Link href="/examples">View Examples</Link>
         </p>
 
         <div className="grid">

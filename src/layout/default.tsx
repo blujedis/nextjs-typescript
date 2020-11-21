@@ -24,7 +24,7 @@ function LayoutDefault(props: PropsWithChildren<ILayout>) {
           rel="noopener noreferrer"
         >
           Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
+          <img src="/vercel.svg" alt="Vercel Logo" className="logo" height="35" />
         </a>
       </footer>
 
@@ -44,6 +44,7 @@ function LayoutDefault(props: PropsWithChildren<ILayout>) {
           display: flex;
           justify-content: center;
           align-items: center;
+          font-size: 0.9rem;
         }
 
         footer img {

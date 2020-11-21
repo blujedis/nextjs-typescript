@@ -1,14 +1,25 @@
+const globby = require('globby');
 const colors = require('ansi-colors');
-const nextPlugins = require('./go/next.plugins');
+const configurePlugins = require('./go/next.plugins');
+const { relative } = require('path');
+
 console.log(colors.magenta('event') + ' Parsing next.config.js');
 
-const configurePlugins = require('./go/next.plugins');
+// We use this to create some links 
+// so we can navigate to know examples.
+const exampleFiles = globby
+  .sync('./src/pages/examples')
+  .map(p => '/' + relative('./src/pages', p)
+    .replace(/\.tsx$/, ''))
+  .filter(p => !p.includes('index'));
 
 const nextConfig = {
 
   // generateEtags: false,
 
-  // env: {},
+  env: {
+    EXAMPLE_FILES: JSON.stringify(exampleFiles)
+  },
 
   // async headers() {
   //   return [

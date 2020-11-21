@@ -1,11 +1,9 @@
 import { PropsWithChildren } from 'react';
 import LayoutDefault from './default';
-import LayoutFull from './full';
 import { ILayoutBase } from './types';
 
 const LAYOUT_MAP = {
-  default: LayoutDefault,
-  full: LayoutFull
+  default: LayoutDefault
 };
 
 function Layout(props: PropsWithChildren<ILayoutBase>) {
