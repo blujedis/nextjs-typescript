@@ -4,3 +4,20 @@
 
 The "Hooks" directory is where we define [React Hooks](https://reactjs.org/docs/hooks-intro.html) to simplify our Page logic.
 
+<table>
+  <thead>
+    <tr><th>Link</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><a href="/src/hooks/swr.tsx" >roles.tsx</a></td><td>Extends <a href="https://github.com/vercel/swr">Nextjs' SWR </a> with some handy features.</td></tr>
+     <tr><td><a href="/src/hooks/media.tsx" >media.tsx</a></td><td>Example page using the</td></tr>
+  </tbody>
+</table>
+
+### SWR Hook
+
+The SWR hook just adds a few features to this great library to make it just a hair more useful. Here are some examples.
+
+### Media Hook
+
+Media hook is helpful with accessing media queries for detecting view port sizes. 

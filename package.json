@@ -20,7 +20,8 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "restash": "^0.1.22",
-    "statuses": "^2.0.0"
+    "statuses": "^2.0.0",
+    "swr": "^0.3.9"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.4",
