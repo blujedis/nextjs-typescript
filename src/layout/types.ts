@@ -1,8 +1,12 @@
 
 export interface ILayoutBase {
-  name?: string;
   title?: string;
-  subtitle?: string;
 }
 
-export interface ILayout extends Omit<ILayoutBase, 'name'> {}
+export interface ILayoutDefault extends ILayoutBase {
+
+}
+
+export interface ILayoutFull extends ILayoutBase {
+  footer?: boolean;
+}

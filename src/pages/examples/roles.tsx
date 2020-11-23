@@ -5,7 +5,7 @@ import initRoles, { RoleKey } from 'utils/roles';
 
 function Roles(props: PageProps) {
   return (
-    <Layout title="Create Next App" {...props}>
+    <Layout title="Roles Guard Example" {...props}>
       <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.5rem' }}>
         If you see this, the Roles Guard component isn't working!!
       </p>

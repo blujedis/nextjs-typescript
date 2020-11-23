@@ -1,10 +1,10 @@
 import { PropsWithChildren } from 'react';
+import { ILayoutFull } from './types';
 import LayoutBase from './base';
-import { ILayoutDefault } from './types';
 
-function LayoutDefault<L extends ILayoutDefault>(props: PropsWithChildren<L>) {
+function LayoutFull<L extends ILayoutFull>(props: PropsWithChildren<L>) {
 
-  const { children } = props;
+  const { children, footer } = props;
 
   return (
     <LayoutBase {...props}>
@@ -13,20 +13,22 @@ function LayoutDefault<L extends ILayoutDefault>(props: PropsWithChildren<L>) {
         {children}
       </main>
 
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className="logo" height="25" />
-        </a>
-      </footer>
+      { !footer ? null :
+        <footer>
+          <a
+            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Powered by{' '}
+            <img src="/vercel.svg" alt="Vercel Logo" className="logo" height="25" />
+          </a>
+        </footer>
+      }
 
       <style jsx>{`
         main {
-          padding: 5rem 0;
+          padding: 0;
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -60,4 +62,4 @@ function LayoutDefault<L extends ILayoutDefault>(props: PropsWithChildren<L>) {
 
 }
 
-export default LayoutDefault;
+export default LayoutFull;

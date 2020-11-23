@@ -10,7 +10,9 @@ The "Hooks" directory is where we define [React Hooks](https://reactjs.org/docs/
   </thead>
   <tbody>
     <tr><td><a href="/src/hooks/swr.tsx" >roles.tsx</a></td><td>Extends <a href="https://github.com/vercel/swr">Nextjs' SWR </a> with some handy features.</td></tr>
-     <tr><td><a href="/src/hooks/media.tsx" >media.tsx</a></td><td>Example page using the</td></tr>
+     <tr><td><a href="/src/hooks/media.tsx" >media.tsx</a></td><td>Hook that provides helpful media query states.</td></tr>
+          <tr><td><a href="/src/hooks/window.tsx" >window.tsx</a></td><td>Hook that gets current window size.</td></tr>
+          <tr><td><a href="/src/hooks/sticky.tsx" >window.tsx</a></td><td>Helpful hook that triggers when to enable/disable a sticky/dropdown type header.</td></tr>
   </tbody>
 </table>
 

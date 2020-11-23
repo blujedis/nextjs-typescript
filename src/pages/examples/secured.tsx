@@ -6,7 +6,7 @@ import withGuard from 'components/with/withGuard';
 
 function Secured(props: PageProps) {
   return (
-    <Layout title="Create Next App" {...props}>
+    <Layout title="Secured Page Example" {...props}>
       <p style={{ color: 'red', fontWeight: 'bold', fontSize: '1.5rem' }}>
         If you see this, the Secured Guard component isn't working!!
       </p>

@@ -61,10 +61,11 @@ function Fetch(props: PageProps) {
   };
 
   return (
-    <Layout title="Create Next App" {...props}>
+    <Layout title="Fetch Api Example" {...props}>
       <div style={{ maxWidth: 500, textAlign: 'center' }}>
         <h3>Fetch Api Example</h3>
         <p>This example demonstrates how to use the fetcher hook which uses <Link href="https://github.com/vercel/swr">Next's SWR underneath</Link></p>
+        <p><Link href="/examples">Return to Examples</Link></p>
         <p style={{ marginTop: 24 }}>
           <button type="button" onClick={() => setVisible(!visible)}
             style={{ padding: '8px 14px', background: 'none', outline: 'none', border: '1px solid #ddd' }}>
