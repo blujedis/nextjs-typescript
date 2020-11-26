@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext, NextPage } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 import ErrorPage from 'pages/_error';
 import { ErrorProps } from 'types';
@@ -7,27 +7,8 @@ const DEV = process.env.NODE_ENV !== 'production';
 
 export interface IWithFallback {
   err?: ErrorProps;
-}
-
-export type RedirectProps = {
-  permanent: boolean
-  destination: string
-}
-
-export interface IServerSidePropsResult<P> {
-  props?: P,
-  redirect?: RedirectProps;
-  notFound?: true;
   [key: string]: any;
 }
-
-export type GetServerSideProps<
-  P extends { [key: string]: any } = { [key: string]: any },
-  Q extends ParsedUrlQuery = ParsedUrlQuery
-  > = (
-    context: GetServerSidePropsContext<Q>
-  ) => Promise<IServerSidePropsResult<P>>
-
 
 /**
  * Fullfills the user defined getServerSideProps promise.
@@ -41,7 +22,8 @@ export function getWithServerSideProps<P, Q extends ParsedUrlQuery>(fn: GetServe
     }
     catch (err) {
       err.stack = DEV ? err.stack : ''; // don't expose stack in production.
-      return { props: { err } };
+      const props = { err } as unknown as P;
+      return { props };
     }
   }
 }
@@ -54,7 +36,7 @@ export function getWithServerSideProps<P, Q extends ParsedUrlQuery>(fn: GetServe
  * @param SuccessPage the Page to be returned on success.
  * @param FallbackPage the Page to be returned on failure.
  */
-export function withFallback<P extends IWithFallback = {}>(
+export function withFallback<P extends IWithFallback = IWithFallback>(
   SuccessPage: NextPage<P>, FallbackPage?: NextPage<P>) {
   FallbackPage = (FallbackPage || ErrorPage) as NextPage<P>;
   return (props: P) => {

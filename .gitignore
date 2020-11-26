@@ -30,4 +30,5 @@ yarn-error.log*
 .env.production.local
 
 .tmp
+temp.js
 

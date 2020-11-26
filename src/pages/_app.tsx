@@ -5,7 +5,7 @@ import { IApp } from 'types';
 function App(props: IApp) {
   const { Component, pageProps, err } = props;
   return (
-    <Providers>
+    <Providers { ...props }>
       <Component err={err} {...pageProps} />
     </Providers>
   );

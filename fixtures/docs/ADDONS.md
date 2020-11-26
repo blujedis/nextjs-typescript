@@ -2,9 +2,8 @@
 <a href="MAIN.md">&larr; MENU</a>
 <br/><br/>
 
-This directory contains addon packages including examples. For example to use the [antd](https://ant.design/) addon you'll need to install using the following command:
+This directory contains simple but largely preconfigured libraries to make it easier to get up and running.
 
-```sh
-$ yarn go add antd
-```
+Here's what's included below:
+
 

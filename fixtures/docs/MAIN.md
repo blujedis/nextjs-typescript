@@ -7,6 +7,7 @@ Click below on any link which corresponds to the project's directory structure. 
     <tr><th>Link</th><th>Description</th></tr>
   </thead>
   <tbody>
+     <tr><td><a href="ADDONS.md" >Addons</a></td><td>Directory containing preconfigured libs for easier spin up.</td></tr>
      <tr><td><a href="COMPONENTS.md" >Components</a></td><td>Directory containing reused components.</td></tr>
      <tr><td><a href="HOOKS.md">Hooks</a></td><td>Directory containing React Hooks.</td></tr>
      <tr><td><a href="LAYOUT.md" >Layout</a></td><td>Directory containing base layouts for all pages.</td></tr>

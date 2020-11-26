@@ -46,6 +46,7 @@ function LayoutDefault<L extends ILayoutDefault>(props: PropsWithChildren<L>) {
 
         footer img {
           margin-left: 0.5rem;
+          height: 25px;
         }
 
         footer a {

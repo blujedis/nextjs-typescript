@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx"
-  ],
+, "src/addons/antd/styles/theme.js"  ],
   "exclude": [
     "node_modules"
   ]

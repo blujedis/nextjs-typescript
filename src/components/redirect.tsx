@@ -1,20 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { UrlObject } from 'url';
+import { IRedirectProps } from 'types';
 
-export interface TransitionOptions {
-  shallow?: boolean;
-  locale?: string | false;
-}
-
-export interface IRedirectProps {
-  url: UrlObject | string;
-  as?: UrlObject | string;
-  options?: TransitionOptions;
-  replace?: boolean;
-}
-
-function Redirect(props: IRedirectProps) {
+function Redirect<P>(props: IRedirectProps & P) {
 
   const { url, as, options, replace } = props;
 

@@ -5,20 +5,25 @@
  * @see pages/_app.tsx
  */
 
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
+import { Provider as NextProvider } from 'next-auth/client';
 import { Provider as StoreProvider } from './store';
 import dynamic from 'next/dynamic';
+import { IApp } from 'types';
 
 const ProgressBar = dynamic(() => import('./progress'), { ssr: false });
 
-function Preflight(props: PropsWithChildren<any>) {
+function Preflight(props: PropsWithChildren<IApp>) {
 
-  const { children } = props;
+  const { children, pageProps } = props;
+  const { session } = pageProps;
 
   return (
     <StoreProvider>
       <ProgressBar />
-      {children}
+      <NextProvider session={session}>
+        {children}
+      </NextProvider>
     </StoreProvider>
   );
 

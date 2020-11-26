@@ -6,14 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "docs": "typedoc . --options ./typedoc.json --out ./docs && touch ./docs/.nojekyll",
-    "go": "node ./go"
+    "docs": "typedoc . --options ./typedoc.json --out ./docs && touch ./docs/.nojekyll"
   },
+  "addons": [
+
+  ],
   "dependencies": {
+    "@types/next-auth": "^3.1.17",
     "camelize": "^1.0.0",
     "decamelize": "^4.0.0",
     "md5": "^2.3.0",
     "next": "^10.0.0",
+    "next-auth": "^3.1.0",
     "next-connect": "^0.9.1",
     "node-sass": "4.14",
     "nprogress": "^0.2.0",
