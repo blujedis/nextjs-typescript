@@ -12,6 +12,8 @@ $ yarn add firebase firebase-admin js-cookie react-firebaseui
 $ yarn add @types/js-cookie -D
 ```
 
+**Or simply run the install helper <code>yarn addon firebase</code> to install.**
+
 ## Enable the Addon
 
 Go to your **package.json** file and and enable the addon.

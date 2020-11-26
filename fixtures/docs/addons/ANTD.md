@@ -12,9 +12,11 @@ $ yarn add antd
 $ yarn add @zeit/next-less @zeit/next-css next-compose-plugins -D
 ```
 
+**Or simply run the install helper <code>yarn addon antd</code> to install.**
+
 ## Import Styles in _app.tsx
 
-Globall CSS files can only be imported into [src/pages/_app.tsx](src/pages/_app.tsx) so head over there and then import
+Globall CSS files can only be imported into [/src/pages/_app.tsx](/src/pages/_app.tsx) so head over there and then import
 the following line.
 
 You'll be able to configure your theme below.

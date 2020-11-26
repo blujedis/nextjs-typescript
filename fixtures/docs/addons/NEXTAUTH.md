@@ -12,6 +12,8 @@ $ yarn add next-auth
 $ yarn add @types/next-auth -D
 ```
 
+**Or simply run the install helper <code>yarn addon nextauth</code> to install.**
+
 ## Env Configuration
 
 Ensure you have updated your env or uncommented the NEXTAUTH section per your requirements.
@@ -22,7 +24,7 @@ For local configurations unless you've changed port etc should already be enable
 
 ## Provider Configuration
 
-**Providers are mounted at [src/providers/index.tsx](src/providers/index.tsx)**
+**Providers are mounted at [/src/providers/index.tsx](/src/providers/index.tsx)**
 
 **NOTE** Your Provider configuration may appear different depending on the
 providers you've added/configured. 
@@ -47,9 +49,9 @@ export default Preflight;
 
 ## Copy Api File
 
-Lastly you'll need to copy the file at [src/addons/nextauth/api/[...nextauth].ts](src/addons/nextauth/api/[...nextauth].ts) to the main **api** folder for next.
+Lastly you'll need to copy the file at [/src/addons/nextauth/api/[...nextauth].ts](/src/addons/nextauth/api/[...nextauth].ts) to the main **api** folder for next.
 
-The path you should end up with is [src/pages/api/auth/[...nextauth].ts](src/pages/api/auth/[...nextauth].ts).
+The path you should end up with is [/src/pages/api/auth/[...nextauth].ts](/src/pages/api/auth/[...nextauth].ts).
 
 ## Enable the Addon
 

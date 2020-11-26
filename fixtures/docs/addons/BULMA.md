@@ -12,9 +12,11 @@ $ yarn add bulma
 $ yarn add node-sass@4.14 -D
 ```
 
+**Or simply run the install helper <code>yarn addon bulma</code> to install.**
+
 ## Import Styles in _app.tsx
 
-Globall CSS files can only be imported into [src/pages/_app.tsx](src/pages/_app.tsx) so head over there and then import
+Globall CSS files can only be imported into [/src/pages/_app.tsx](/src/pages/_app.tsx) so head over there and then import
 the following line.
 
 ```tsx

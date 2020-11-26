@@ -67,7 +67,7 @@ const BulmaExample = () => {
         </nav>
 
       </header>
-      <main className="container" style={{ color: 'crimson' }}>
+      <main className="container">
         <p>If this doesn't look right ensure you have run <code>yarn add bluma</code> and have imported the package in <strong>_app.tsx</strong></p>
       </main>
       <footer className="has-text-centered">
