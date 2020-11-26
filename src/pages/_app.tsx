@@ -1,11 +1,13 @@
 import Providers from 'providers';
 import { IApp } from 'types';
+// import 'addons/bulma/styles/index.scss';
+// import 'antd/dist/antd.less';
 
 // import App from 'next/app'
 function App(props: IApp) {
   const { Component, pageProps, err } = props;
   return (
-    <Providers { ...props }>
+    <Providers {...props}>
       <Component err={err} {...pageProps} />
     </Providers>
   );

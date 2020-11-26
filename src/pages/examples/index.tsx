@@ -3,6 +3,10 @@ import Link from 'next/link';
 
 const EXAMPLE_FILES = JSON.parse(process.env.EXAMPLE_FILES || '');
 
+const DEFAULT_EXAMPLES = EXAMPLE_FILES.filter(f => !f.includes('addons'));
+
+const ADDON_EXAMPLES = EXAMPLE_FILES.filter(f => f.includes('addons'));
+
 const Examples = () => {
 
   return (
@@ -21,13 +25,32 @@ const Examples = () => {
           addons that contain examples you will need to restart to see the links here.
         </p>
 
+        <h4>Default Examples</h4>
+
         <ul>
-          {EXAMPLE_FILES.map((item, i) => {
+          {DEFAULT_EXAMPLES.map((item, i) => {
             return (
               <li key={i + 1}><Link href={item}>{item}</Link></li>
             );
           })}
         </ul>
+
+        {!ADDON_EXAMPLES || !ADDON_EXAMPLES.length ? null :
+
+          <>
+            <h4>Addon Examples</h4>
+
+            <ul>
+              {ADDON_EXAMPLES.map((item, i) => {
+                return (
+                  <li key={i + 1}><Link href={item}>{item}</Link></li>
+                );
+              })}
+            </ul>
+          </>
+
+        }
+
 
         <style jsx>{`
         ul {

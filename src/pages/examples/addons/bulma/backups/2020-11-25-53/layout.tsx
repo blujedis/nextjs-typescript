@@ -68,7 +68,7 @@ const BulmaExample = () => {
 
       </header>
       <main className="container">
-        <p>If this doesn't look right ensure you have run <code>yarn add bluma</code> and have imported the package in <strong>_app.tsx</strong></p>
+        <p>Your Content Here</p>
       </main>
       <footer className="has-text-centered">
         <span className="is-size-7">&copy; 2020 Your Company Here | Blujedis</span>

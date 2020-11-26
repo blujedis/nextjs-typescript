@@ -22,9 +22,9 @@ const seconds = date.getSeconds();
 const timestamp = `${year}-${month}-${day}-${seconds}`;
 
 cleanNames.forEach(v => {
-  if (existsSync(`./src/pages/examples/${v}`)) {
-    copySync(`./src/pages/examples/${v}`, `./src/addons/${v}/examples/backups/${timestamp}`); // just to be safe.
-    removeSync(`./src/pages/examples/${v}`);
+  if (existsSync(`./src/pages/examples/addons/${v}`)) {
+    copySync(`./src/pages/examples/addons/${v}`, `./src/addons/${v}/examples/backups/${timestamp}`); // just to be safe.
+    removeSync(`./src/pages/examples/addons/${v}`);
   }
 });
 
@@ -36,7 +36,7 @@ const addonExamplesDirs = !addons.length ? [] : globby.sync('./src/addons/**/exa
 // Copy examples.
 addonExamplesDirs.forEach(src => {
   const dir = src.split('/').slice(-2, -1);
-  copySync(src, `./src/pages/examples/${dir}`);
+  copySync(src, `./src/pages/examples/addons/${dir}`);
 });
 
 // We use this to create some links 
@@ -45,7 +45,7 @@ const exampleFiles = globby
   .sync('./src/pages/examples')
   .map(p => '/' + relative('./src/pages', p)
     .replace(/\.tsx$/, ''))
-  .filter(p => !p.includes('index'));
+  .filter(p => !p.includes('index') && !p.includes('backups'));
 
 console.log(colors.magenta('event') + ' Parsing next.config.js');
 
