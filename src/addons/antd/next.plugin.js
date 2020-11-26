@@ -5,7 +5,6 @@
 const withLess = require('@zeit/next-less');
 const withCss = require('@zeit/next-css');
 const themeVars = require('./styles/theme');
-// const withPlugins = require('next-compose-plugins');
 
 // NOTE: if you wish to import your variables
 // you can do so with the below
@@ -16,7 +15,7 @@ const themeVars = require('./styles/theme');
 // Now you can use these vars in your project and also
 // have it automatically build out the theme as well.
 
-module.exports = function antdPlugin(nextConfig) {
+module.exports = (nextConfig) => {
 
   const css = withCss({
     cssModules: true, // Disable if you do NOT want css modules. Next forces modules out of box by default.
@@ -30,10 +29,9 @@ module.exports = function antdPlugin(nextConfig) {
 
     lessLoaderOptions: {
       javascriptEnabled: true,
-      modifyVars: {
-        'primary-color': '#066',
-      }
+      modifyVars: themeVars
     },
+
     webpack: (config, { isServer }) => {
 
       if (isServer) {
@@ -74,6 +72,6 @@ module.exports = function antdPlugin(nextConfig) {
 
   const plugins = [css, less];
 
-  return less; //withPlugins(plugins, nextConfig);
+  return { ...css, ...less };
 
 };
