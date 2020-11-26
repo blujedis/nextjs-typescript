@@ -1,6 +1,6 @@
 import useSWR, { ConfigInterface, keyInterface } from 'swr';
 import { fetcherFn, responseInterface } from 'swr/dist/types';
-import qs from 'qs';
+import qs from 'querystring';
 
 export type BodyInit = Blob | BufferSource | FormData | URLSearchParams | ReadableStream<Uint8Array> | string | Record<string, any>;
 

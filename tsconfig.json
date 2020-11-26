@@ -21,12 +21,15 @@
   },
   "include": [
     "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.{ts,tsx}"
   ],
   "exclude": [
     "node_modules",
     "src/**/*.js",
-    "src/**/*.jsx"
+    "src/**/*.jsx",
+    "src/addons/antd/**",
+    "src/addons/bulma/**",
+    "src/addons/firebase/**",
+    "src/addons/nextauth/**"
   ]
 }

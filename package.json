@@ -9,9 +9,7 @@
     "docs": "typedoc . --options ./typedoc.json --out ./docs && touch ./docs/.nojekyll",
     "addon": "node ./src/addons/cli"
   },
-  "addons": [
-    "antd"
-  ],
+  "addons": [],
   "dependencies": {
     "camelize": "^1.0.0",
     "decamelize": "^4.0.0",
@@ -37,6 +35,7 @@
     "fs-extra": "^9.0.1",
     "globby": "^11.0.1",
     "minimist": "^1.2.5",
+    "next-compose-plugins": "^2.2.1",
     "table": "^6.0.4",
     "typedoc": "^0.19.2",
     "typescript": "~4.1.2"
