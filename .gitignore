@@ -31,4 +31,5 @@ yarn-error.log*
 
 .tmp
 temp.js
+src/addons/**/examples/backups/**
 

@@ -3,7 +3,7 @@ const { spawnSync } = require('child_process');
 const { magentaBright } = require('ansi-colors');
 
 const packages = {
-  antd: { dependencies: ['antd'], devDependencies: ['@zeit/next-less', '@zeit/next-css', 'next-compose-plugins'] },
+  antd: { dependencies: ['antd', 'less'], devDependencies: ['@zeit/next-less', '@zeit/next-css', 'next-compose-plugins', 'less-js-to-vars'] },
   bulma: { dependencies: ['bulma'], devDependencies: ['node-sass@4.14.1'] },
   firebase: { dependencies: ['firebase', 'firebase-admin', 'js-cookie', 'react-firebaseui'], devDependencies: ['@types/js-cookie'] },
   nextauth: { dependencies: ['next-auth'], devDependencies: ['@types/next-auth'] },

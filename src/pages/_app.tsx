@@ -1,6 +1,7 @@
 import Providers from 'providers';
 import { IApp } from 'types';
-import 'antd/dist/antd.less';
+// import 'addons/bulma/styles/index.scss';
+// import 'antd/dist/antd.less';
 
 // import App from 'next/app'
 function App(props: IApp) {
