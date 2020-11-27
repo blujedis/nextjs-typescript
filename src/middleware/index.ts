@@ -55,3 +55,5 @@ export function createHandler(...middleware: Middleware[]) {
   return handler;
 
 }
+
+export default createHandler;
