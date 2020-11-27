@@ -1,4 +1,4 @@
-const { redBright, magentaBright } = require('ansi-colors');
+const { redBright, magentaBright, yellowBright } = require('ansi-colors');
 let argv = process.argv.slice(2);
 const cmd = argv.shift();
 const flags = argv.filter(v => ~v.indexOf('-'));
@@ -10,11 +10,12 @@ if (argv.length) {
   process.exit();
 }
 
-const { runner, pkg, tsconfig, cleanTsConfig, remove, addonNames, cleanAddonFiles } = require('./utils');
-const { writeJSONSync } = require('fs-extra');
+const { runner, pkg, tsconfig, cleanTsConfig, remove,
+  addonNames, cleanAddonFiles, enableAddonFiles, saveJSON, getTsConfigDisabled, updateTsConfig } = require('./utils');
+
+const { join } = require('path');
 
 const action = flags.includes('--remove') || flags.includes('-r') ? 'remove' : 'add';
-const tsTemplate = `src/addons/{{dir}}/**`;
 
 const { run, config } = runner(cmd, action);
 
@@ -47,6 +48,7 @@ Commands:
 Flags:
   --remove, -r        used with above command to remove install.
   --all, -a           when present cleans all not just disabled.
+  --clean, -c         when present cleans all when used with --remove.
 
 `;
   console.log(help);
@@ -55,23 +57,39 @@ else if (cmd && config) {
 
   pkg.addons = pkg.addons || [];
 
+  let msg = '';
+
   if (action === 'add') {
-    pkg.addons.push(cmd);
-    cleanTsConfig(pkg.addons);
+    pkg.addons = [...pkg.addons.filter(v => v !== cmd), cmd];
+    msg = config.addMessage;
   }
   else {
     pkg.addons = pkg.addons.filter(v => v !== cmd);
-    cleanTsConfig(pkg.addons);
-    tsconfig.exclude.push(tsTemplate.replace('{{dir}}', cmd));
+
+    msg = config.removeMessage;
   }
+
+  updateTsConfig();
+
+  saveJSON(join(process.cwd(), 'package.json'), pkg);
+  
+  saveJSON(join(process.cwd(), 'tsconfig.json'), tsconfig);
 
   const actionText = action === 'remove' ? 'removing' : 'adding';
   console.log(`${magentaBright('addon')} ${actionText} ${cmd}`);
 
   run();
 
-  writeJSONSync('../../package.json', pkg);
-  writeJSONSync('../../tsconfig.json', tsconfig);
+  if (action === 'remove') {
+    if (flags.includes('-c') || flags.includes('--clean'))
+      cleanAddonFiles(cmd);
+  }
+  else {
+    enableAddonFiles(cmd);
+  }
+
+  if (msg)
+    console.log('\n' + yellowBright(msg) + '\n');
 
 }
 else {

@@ -8,14 +8,29 @@ const pkg = require('../../package.json');
 const tsconfig = require('../../tsconfig.json');
 
 const addonNames = globby.sync('./src/addons', { onlyDirectories: true, deep: 1 }).map(d => d.split('/').pop());
-
-const disabled = addonNames.filter(v => !pkg.addons.includes(v));
+const tsExcludeTemplate = `src/addons/{{dir}}/**`;
 
 const packages = {
-  antd: { dependencies: ['antd', 'less'], devDependencies: ['@zeit/next-less', '@zeit/next-css', 'next-compose-plugins', 'less-vars-to-js'] },
-  bulma: { dependencies: ['bulma'], devDependencies: ['node-sass@4.14.1'] },
-  firebase: { dependencies: ['firebase', 'firebase-admin', 'js-cookie', 'react-firebaseui'], devDependencies: ['@types/js-cookie'] },
-  nextauth: { dependencies: ['next-auth'], devDependencies: ['@types/next-auth'] },
+  antd: {
+    dependencies: ['antd', 'less'],
+    devDependencies: ['@zeit/next-less', '@zeit/next-css', 'next-compose-plugins', 'less-vars-to-js'],
+    addMessage: `Don't forget to comment IN antd less style imports in ./src/pages/_app.tsx!`,
+  },
+  bulma: {
+    dependencies: ['bulma'],
+    devDependencies: ['node-sass@4.14.1'],
+    addMessage: `Don't forget to comment IN bulma style imports in ./src/pages/_app.tsx!`,
+  },
+  firebase: {
+    dependencies: ['firebase', 'firebase-admin', 'js-cookie', 'react-firebaseui'],
+    devDependencies: ['@types/js-cookie']
+  },
+  nextauth: {
+    dependencies: ['next-auth'],
+    devDependencies: ['@types/next-auth'],
+    addMessage: `Don't forget to comment IN next-auth imports in ./src/providers/index.tsx!`,
+    removeMessage: `Don't forget to comment OUT in ./src/providers/index.tsx!`
+  }
 };
 
 const timestamp = (date = new Date()) => {
@@ -26,21 +41,30 @@ const timestamp = (date = new Date()) => {
   return `${year}-${month}-${day}-${seconds}`;
 };
 
-const cleanTsConfig = (enabled = []) => {
-  const active = tsconfig.exclude.filter(v => {
-    return enabled.some(n => v.includes(n))
-  });
-  if (!active.length)
-    tsconfig.exclude = tsconfig.exclude.filter(v => {
-      return !addonNames.some(n => v.includes(n));
-    });
-  else
-    tsconfig.exclude = tsconfig.exclude.filter(v => !active.includes(v));
+const getDisabled = (addons = pkg.addons) => {
+  return addonNames.filter(v => !addons.includes(v));
 };
 
-const runner = (cmd, action) => {
+const cleanTsConfig = () => {
+  const excludeGlobs = addonNames.map(n => tsExcludeTemplate.replace(`{{dir}}`, n));
+  tsconfig.exclude = tsconfig.exclude.filter(v => !excludeGlobs.includes(v));
+};
 
-  const config = packages[cmd];
+const getTsConfigDisabled = () => {
+  return getDisabled().map(n => tsExcludeTemplate.replace(`{{dir}}`, n));
+};
+
+const updateTsConfig = () => {
+  cleanTsConfig();
+  const tsDisabled = getTsConfigDisabled();
+  tsconfig.exclude = [...tsconfig.exclude, ...tsDisabled]
+};
+
+const runner = (name, action) => {
+
+  const config = packages[name];
+  const deps = config.dependencies || [];
+  const devDeps = config.devDependencies || [];
 
   function runSpawn(runCmd, args = [], options, dev) {
 
@@ -56,16 +80,25 @@ const runner = (cmd, action) => {
 
     args = args.flat().filter(v => v !== 'next-compose-plugins');
 
-    if (dev)
-      args.push('-D');
+    // If removing remove versions from 
+    // package names. 
+    if (action === 'remove')
+      args = args.map(a => {
+        a = a.split('@')[0];
+        return a;
+      });
+
+    // if (dev)
+    //   args.push('-D');
 
     console.log(`${magentaBright('addon')} running command "${runCmd + ' ' + args[0]} ${args.slice(1).join(' ')}"`);
     spawnSync(runCmd, args, options);
+
   }
 
   function run() {
-    runSpawn('yarn', [action, config.dependencies])
-    runSpawn('yarn', [action, config.devDependencies], true)
+    runSpawn('yarn', [action, ...deps])
+    runSpawn('yarn', [action, ...devDeps], true)
   }
 
   return {
@@ -139,7 +172,7 @@ const getExamplePaths = (validate = true) => {
 
   if (validate) {
 
-    const disabledPaths = disabled.reduce((a, c) => {
+    const disabledPaths = getDisabled().reduce((a, c) => {
       let files = getAddonFiles(c);
       let idx = null;
       if (files[0])
@@ -152,6 +185,8 @@ const getExamplePaths = (validate = true) => {
       a = [...a, ...files];
       return a;
     }, []);
+
+
 
     const hasDisabled = disabledPaths.filter(p => existsSync(p));
 
@@ -170,23 +205,22 @@ const getExamplePaths = (validate = true) => {
 
 };
 
-
-
-const saveJSON = (src, data) => {
-  return writeJSONSync(src, data);
+const saveJSON = (src, data, options) => {
+  return writeJSONSync(src, data, { spaces: 2 });
 };
 
 module.exports = {
   pkg,
   addonNames,
   enabled: pkg.addons,
-  disabled,
   tsconfig,
   packages,
   timestamp,
   getAddonFiles,
   getPagesFiles,
   cleanTsConfig,
+  getTsConfigDisabled,
+  updateTsConfig,
   enableAddonFiles,
   disableAddonFiles,
   cleanAddonFiles,
