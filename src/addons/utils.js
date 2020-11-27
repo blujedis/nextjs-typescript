@@ -128,7 +128,7 @@ const backup = (src) => {
   const segments = src.split('/');
   let dir = segments.find(s => addonNames.includes(s));
   dir = dir || 'other';
-  return copy(src, `./addons/backups/${dir}/${timestamp()}/${basename(src)}`);
+  return copy(src, `./src/addons/backups/${dir}/${timestamp()}/${basename(src)}`);
 };
 
 const enableAddonFiles = (names = []) => {
