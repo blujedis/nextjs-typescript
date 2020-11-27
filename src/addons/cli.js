@@ -17,7 +17,9 @@ const { join } = require('path');
 
 const action = flags.includes('--remove') || flags.includes('-r') ? 'remove' : 'add';
 
-const { run, config } = runner(cmd, action);
+const runnerInit = runner(cmd, action);
+
+console.log(cmd);
 
 // Clean examples for non-enabled addons
 if (cmd === 'clean') {
@@ -53,7 +55,9 @@ Flags:
 `;
   console.log(help);
 }
-else if (cmd && config) {
+else if (cmd && runnerInit) {
+
+  const { run, config } = runnerInit;
 
   pkg.addons = pkg.addons || [];
 
@@ -72,7 +76,7 @@ else if (cmd && config) {
   updateTsConfig();
 
   saveJSON(join(process.cwd(), 'package.json'), pkg);
-  
+
   saveJSON(join(process.cwd(), 'tsconfig.json'), tsconfig);
 
   const actionText = action === 'remove' ? 'removing' : 'adding';

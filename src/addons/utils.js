@@ -62,6 +62,9 @@ const updateTsConfig = () => {
 
 const runner = (name, action) => {
 
+  if (name === 'help')
+    return;
+
   const config = packages[name];
   const deps = config.dependencies || [];
   const devDeps = config.devDependencies || [];
