@@ -35,6 +35,7 @@
     "src/addons/bulma/**",
     "src/addons/chakra/**",
     "src/addons/defaults/**",
+    "src/addons/emotion/**",
     "src/addons/evergreen/**",
     "src/addons/firebase/**",
     "src/addons/nextauth/**",

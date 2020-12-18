@@ -1,6 +1,5 @@
-import {} from 'evergreen-ui';
 
-const EvergreenExample = () => {
+const StyledComponentsExample = () => {
 
 
   return (
@@ -9,7 +8,8 @@ const EvergreenExample = () => {
         Header
       </header>
       <main >
-        Main
+       <h2>Styled Components</h2> 
+       <p>Example not implemented</p>
       </main>
       <footer style={{ position: 'fixed', width: '100%', bottom: 0, textAlign: 'center', padding: '1rem 0' }}>
         Footer
@@ -19,4 +19,4 @@ const EvergreenExample = () => {
 
 }
 
-export default EvergreenExample;
+export default StyledComponentsExample;

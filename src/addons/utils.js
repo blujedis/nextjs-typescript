@@ -140,7 +140,13 @@ const remove = (src) => {
 };
 
 const getAddonFiles = (name) => {
-  return globby.sync(`./src/addons/${name}/pages`, { onlyFiles: true });
+  const excluded = [
+    `!./src/addons/${name}/pages/_app.tsx`,
+    `!./src/addons/${name}/pages/_document.tsx`,
+    `!./src/addons/${name}/pages/404.tsx`,
+    `!./src/addons/${name}/pages/_error.tsx`,
+  ];
+  return globby.sync([`./src/addons/${name}/pages`, ...excluded], { onlyFiles: true });
 };
 
 const getPagesFiles = () => {
@@ -196,19 +202,21 @@ const getExamplePaths = (validate = true) => {
 
   if (validate) {
 
-    const disabledPaths = getDisabled().reduce((a, c) => {
-      let files = getAddonFiles(c);
-      let idx = null;
-      if (files[0])
-        idx = files[0].split('/').indexOf('pages') + 1;
-      if (idx)
-        files = files.map(f => {
-          const segments = f.split('/');
-          return join('./src/pages', segments.slice(idx).join('/'));
-        });
-      a = [...a, ...files];
-      return a;
-    }, []);
+    const disabledPaths = getDisabled()
+      .filter(v => v !== 'defaults')
+      .reduce((a, c) => {
+        let files = getAddonFiles(c);
+        let idx = null;
+        if (files[0])
+          idx = files[0].split('/').indexOf('pages') + 1;
+        if (idx)
+          files = files.map(f => {
+            const segments = f.split('/');
+            return join('./src/pages', segments.slice(idx).join('/'));
+          });
+        a = [...a, ...files];
+        return a;
+      }, []);
 
 
 
