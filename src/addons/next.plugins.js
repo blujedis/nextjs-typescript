@@ -9,7 +9,7 @@ const { pkg, enableAddonFiles } = require('./utils');
 
 // Enable template/example files.
 console.log(magentaBright('event') + ' Ensure addon examples/files.');
-enableAddonFiles(pkg.addons);
+enableAddonFiles(pkg.addons.active);
 
 module.exports = (nextConfig) => {
 
@@ -18,7 +18,7 @@ module.exports = (nextConfig) => {
   let plugins = [];
 
   // Iterate enabled plugins and extend.
-  pkg.addons.forEach(name => {
+  pkg.addons.active.forEach(name => {
 
     const path = join(__dirname, name, 'next.plugin.js');
 

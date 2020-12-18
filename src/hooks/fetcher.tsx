@@ -1,5 +1,5 @@
 import useSWR, { ConfigInterface, keyInterface } from 'swr';
-import { fetcherFn, responseInterface } from 'swr/dist/types';
+import { fetcherFn } from 'swr/dist/types';
 import qs from 'querystring';
 
 export type BodyInit = Blob | BufferSource | FormData | URLSearchParams | ReadableStream<Uint8Array> | string | Record<string, any>;
@@ -12,29 +12,11 @@ export interface IRequestInit extends Omit<RequestInit, 'url' | 'body'> {
 
 export interface IConfigInterface<Data = any, Error = IFetchError, Fn extends fetcherFn<Data> = fetcherFn<Data>> extends ConfigInterface<Data, Error, Fn>, Omit<IRequestInit, 'body'> { }
 
-export interface IResponseInterface<Data = any, Error = IFetchError> extends responseInterface<Data, Error> {
-  payload: FetchPayload<Data>;
-};
-
-export type ResponseInterface<Data = any, Ext extends Object = {}, Error = IFetchError> = responseInterface<FetchPayload<Data, Ext>, Error> & { payload?: FetchPayload<Data, Ext> };
-
 export interface IFetchError extends Error {
   status: number;
   statusText: string;
   [key: string]: any;
 }
-
-export interface IFetchPayload<T> {
-  ok: boolean;
-  type: ResponseType;
-  url: string;
-  status: number;
-  statusText: string;
-  data: T;
-  get?: { [K in keyof T]: T[K] };
-}
-
-export type FetchPayload<Data, Ext extends Object = any> = IFetchPayload<Data> & Ext;
 
 /**
  * Common statuses.
@@ -118,7 +100,7 @@ function safeGet<T>(data: T, key: keyof T, def = '') {
  * @param data the object to create getters from.
  * @param keys the keys to apply safe gets for.
  */
-function initSafe<T>(data: T, keys: (keyof T)[] = []) {
+function applySafe<T>(data: T, keys: (keyof T)[] = []) {
   const obj = {};
   if (!keys.length)
     keys = Object.keys(data) as (keyof T)[];
@@ -138,7 +120,7 @@ function initSafe<T>(data: T, keys: (keyof T)[] = []) {
  * @param endpoint the endpoint to be fetched.
  * @param config optional fetch configuration.
  */
-async function fetcherBase<Data = any, Ext extends Object = {}>(endpoint: string, initConfig: IRequestInit = {}) {
+async function fetcher<Data = any, Ext extends Object = {}>(endpoint: string, initConfig: IRequestInit = {}) {
 
   try {
 
@@ -166,74 +148,48 @@ async function fetcherBase<Data = any, Ext extends Object = {}>(endpoint: string
      */
     const request = new Request(endpoint, config as RequestInit);
     const res = await fetch(request);
-    const { ok, status, statusText, url, type } = res;
-    const init = { ok, status, statusText, url, type, data: null, get: {} } as FetchPayload<Data, Ext>;
 
-    if (!ok)
-      return Promise.reject(init);
+    if (!res.ok)
+      return Promise.reject({ status: res.status, statusText: res.statusText });
 
     const text = await res.text();
-    const data = text === '' ? null : tryParseJSON(text);
+    let data = text === '' ? null : tryParseJSON(text);
 
-    const payload = { ...init, request, data } as FetchPayload<Data, Ext>;
+    // Add safe getter do object when JSON is returned.
+    if (!Array.isArray(data) && data !== null && typeof data === 'object' && safe)
+      data = applySafe(data);
 
-    // Add safe getters for props.
-    if (safe && payload.data !== null && !Array.isArray(payload.data) && typeof payload.data === 'object')
-      payload.get = initSafe(payload.data);
-
-    return payload;
+    return data;
 
   }
-  catch (ex) {
-
-    const err = (ex || new Error(`Invalid fetch payload.`)) as Error & { [key: string]: any; };
+  catch (err) {
     err.status = err.status || 500;
     err.name = err.name || STATUS_MAP[err.status] || 'Server Error';
     err.statusText = err.statusText || 'Unknown Server Error.';
-    console.log(ex);
     return Promise.reject(err);
-
   }
 
 }
 
-/**
- * Creates a fetcher using SWR underneath.
- * 
- * @param key the key to use for the fetcher typically a string or array.
- * @param config the configuration object.
- * @param fetcher optional custom fetcher to use.
- */
-export function createFetcher<Data = any, Ext = Record<string, any>, Error = IFetchError, Fn extends fetcherFn<FetchPayload<Data, Ext>> = fetcherFn<FetchPayload<Data, Ext>>>(
-  key: keyInterface, initConfig?: IConfigInterface<FetchPayload<Data, Ext>, Error, Fn>, fetcher?: Fn) {
-  fetcher = fetcher || fetcherBase as Fn;
+fetcher.get = (endpoint: string, config: IRequestInit = {}) => fetcher(endpoint, { ...config, method: 'GET' });
+fetcher.put = (endpoint: string, config: IRequestInit = {}) => fetcher(endpoint, { ...config, method: 'PUT' });
+fetcher.post = (endpoint: string, config: IRequestInit = {}) => fetcher(endpoint, { ...config, method: 'POST' });
+fetcher.del = (endpoint: string, config: IRequestInit = {}) => fetcher(endpoint, { ...config, method: 'DELETE' });
 
-  return function (config?: IConfigInterface<FetchPayload<Data, Ext>, Error, Fn>) {
-
-    config = {
-      ...initConfig,
-      ...config
-    };
-
-    const result = useSWR<FetchPayload<Data, Ext>>(key, fetcherBase, config) as ResponseInterface<Data, Ext, Error>
-    result.payload = result.data || {} as any;
-    result.payload.get = result.payload.get || {} as any;
-
-    return result as Omit<ResponseInterface<Data, Ext, Error>, 'data'>;
-
+export default function useFetcher<Data = any, Err = IFetchError, Fn extends fetcherFn<Data> = fetcherFn<Data>>(
+  key: keyInterface,
+  fn?: Fn | IConfigInterface<Data, Err, Fn>,
+  config?: IConfigInterface<Data, Err, Fn>) {
+  if (fetcher && typeof fetcher !== 'function') {
+    config = fn as IConfigInterface<Data, Err, Fn>;
+    fn = undefined;
   }
-
+  fn = (fn || ((endpoint, ...args) => {
+    if (Array.isArray(endpoint) || typeof endpoint === 'function')
+      throw new Error(`Must use custom fetcher when keyInterface is an array or function.`);
+    return fetcher(endpoint, ...args);
+  })) as Fn;
+ return useSWR<Data, Err>(key, fetcher, config);
 };
 
-// Default vanilla useSWR.
-export { useSWR };
-
-/**
- * Directly creates useSWR fetcher for immediate use.
- * 
- * @param url the url endpoint for the request.
- * @param config the configuration object.
- */
-export default function useFetcher<Data = any, Ext = Record<string, any>>(url: string, config?: IConfigInterface<FetchPayload<Data, Ext>>) {
-  return createFetcher(url, config)();
-}
+export { fetcher };

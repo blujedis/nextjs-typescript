@@ -1,11 +1,16 @@
 const { getExamplePaths } = require('./src/addons/utils');
 const configurePlugins = require('./src/addons/next.plugins');
+const pkg = require('./package.json');
+const addonsConfig = pkg.addons;
 
 const nextConfig = {
 
   // generateEtags: false,
 
   env: {
+    APP_NAME: pkg.name,
+    APP_VERSION: pkg.version,
+    ADDONS_CONFIG: JSON.stringify(addonsConfig),
     EXAMPLE_FILES: JSON.stringify(getExamplePaths())
   },
 

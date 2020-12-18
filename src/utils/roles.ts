@@ -1,19 +1,24 @@
 
-export type RoleMap<T extends Object> = { [K in keyof T]: keyof T[] };
+export type RoleMap<T extends Object> = { [K in keyof T]: Extract<keyof T, string>[] };
 
-export type RoleKey<T> = keyof T;
+export type RoleKey<T> = Extract<keyof T, string>;
 
+/**
+ * Ensures that map is key with value of array.
+ * 
+ * @param map the map to be normalized.
+ */
 export function normalizeMap<T extends Object>(map: T) {
 
-  const ROLES: RoleMap<T> = {} as any;
+  const MAP: RoleMap<T> = {} as any;
 
   for (const k in map) {
 
-    if (!map.hasOwnProperty(k)) continue;
-    let val = map[k] || [];
+    if (!Object.hasOwnProperty.call(map, k)) continue;
+    let val = (map[k] || []) as T[Extract<keyof T, string>];
 
     if (typeof val === 'string')
-      val = [val];
+      val = [val] as unknown as T[Extract<keyof T, string>];
 
     if (!Array.isArray(val))
       throw new Error(`Failed to normalize Role ${k}, could NOT be normalized to array.`);
@@ -21,11 +26,11 @@ export function normalizeMap<T extends Object>(map: T) {
     if ((val as any).length && typeof val[0] !== 'string')
       throw new Error(`Invalid Role argument type of ${typeof val[0]}.`);
 
-    ROLES[k] = val as any;
+    MAP[k] = val as any;
 
   }
 
-  return ROLES;
+  return MAP;
 
 }
 
@@ -55,7 +60,10 @@ export default function roleManager<M>(initMap: M) {
    * @param arr the array to be flattened. 
    */
   function flatten<T>(arr: T[]): T[] {
-    return arr.reduce((a, c) => [...a, ...(Array.isArray(c) ? flatten(c as any) : [c])], []);
+    return arr.reduce((a, c) => {
+      [...a, ...(Array.isArray(c) ? flatten(c as any) : [c])];
+      return a;
+    }, [] as T[]);
   }
 
   /**
@@ -156,7 +164,7 @@ export default function roleManager<M>(initMap: M) {
       return roles as Role[];
     roles = Array.isArray(roles[0]) ? roles[0] : roles;
     const allRoles = flatten((roles as Role[]).map(role => {
-      return flatten(getRole(role).map(getRole as any));
+      return flatten((getRole(role) || []).map(getRole as any));
     })) as unknown as Role[];
     return dedupe(allRoles);
   }

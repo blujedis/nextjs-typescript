@@ -19,7 +19,7 @@ cd your_app_name && npm install
 
 ## Running Project
 
-Once installed start up the project.
+Once installed start up the project to ensure all is well.
 
 ```sh
 $ npm run dev
@@ -29,7 +29,7 @@ $ npm run dev
 
 <img src="fixtures/running.png" alt="Image of server running at address"/>
 
-## How to Use
+## How to Use Scaffolding
 
 Click below for additional README docs explaining the structure of the project and how to customize/implement features.
 

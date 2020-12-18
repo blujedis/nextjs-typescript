@@ -7,12 +7,13 @@ import queryMiddleware from './extend/query';
 import reqIdMiddleware from './extend/reqid';
 import responseMiddleware from './extend/response';
 
-export type ResponseHandler = (data?: any, statusCode?: number, contentType?: string) => void;
+export type ResponseHandler = (data: any, statusCode?: number, statusMessage?: string) => void;
 
 export type ResponseErrorHandler = (err?: string | Error) => void;
 
 export type Request = NextApiRequest & {
   rid: string;
+  user: any;
 };
 
 export type Response = NextApiResponse & {
@@ -22,7 +23,7 @@ export type Response = NextApiResponse & {
   notFound: ResponseErrorHandler;
   serverError: ResponseErrorHandler;
   notAllowed: ResponseErrorHandler;
-  handle: ResponseHandler;
+  handleJSON: ResponseHandler;
 };
 
 export type MiddlewareError<R = void> = (err: Error, req: Request, res: Response, next: (err?: any) => void) => R;
@@ -50,7 +51,7 @@ export function createHandler(...middleware: Middleware[]) {
 
   // Order is IMPORTANT here do NOT change
   // unless you know what you're doing.
-  handler.use(responseMiddleware(), reqIdMiddleware(), queryMiddleware, loggerMiddleware(), ...middleware);
+  handler.use(reqIdMiddleware(),responseMiddleware(), queryMiddleware, loggerMiddleware(), ...middleware);
 
   return handler;
 

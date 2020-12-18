@@ -2,6 +2,9 @@
 import { Request, Response } from '..';
 import { LogHandler } from './logger';
 
+const APP_NAME = process.env.APP_NAME;
+const APP_VERSION = process.env.APP_VERSION;
+
 const STATUS_MAP_BASE = {
   400: 'Bad Request',
   401: 'Unauthenticated',
@@ -14,26 +17,19 @@ const STATUS_MAP_BASE = {
 function responseMiddleware(log?: LogHandler, statusMap?: { [key: number]: string }) {
 
   log = log || console.log;
-  statusMap = statusMap || STATUS_MAP_BASE;
 
   function handleResponse(res: Response, req: Request) {
 
-    return (data?: any, statusCode = 200, contentType = 'application/json') => {
+    return (data?: any, statusCode = 200, statusText = null) => {
 
       res.statusCode = statusCode;
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('APP-RID', JSON.stringify(req.rid));
+      res.statusMessage = statusText || STATUS_MAP_BASE[statusCode];
 
       if (data instanceof Error) {
-
-        // Log the inner error if exists.
-        if ((data as any).inner)
-          log.error((data as any).inner, { rid: req.rid });
-
-
-        res.statusMessage = STATUS_MAP[statusCode] + ': ' + data.message;
+        log(data, { rid: req.rid });
+        statusCode = 500;
+        res.statusMessage = STATUS_MAP_BASE[statusCode] + ': ' + data.message;
         data = '';
-
       }
 
       res.json(data);
@@ -45,22 +41,32 @@ function responseMiddleware(log?: LogHandler, statusMap?: { [key: number]: strin
   function handleError(res: Response, req: Request, statusCode: number) {
     return (err?: string | Error) => {
       if (typeof err === 'string') {
-        err = new Error(err as string || STATUS_MAP[statusCode]);
-        err.name = STATUS_MAP[statusCode];
+        err = new Error(err as string || statusMap[statusCode]);
+        err.name = statusMap[statusCode];
       }
       handleResponse(res, req)(err, statusCode);
     };
   }
 
   return (req: Request, res: Response, next: (err?: any) => void) => {
+
+
+    res.setHeader(`${APP_NAME.toUpperCase() + '-NAME'}`, JSON.stringify(APP_NAME));
+    res.setHeader(`${APP_NAME.toUpperCase() + '-VERSION'}`, JSON.stringify(APP_VERSION));
+    res.setHeader(`${APP_NAME.toUpperCase() + '-REQUEST-ID'}`, JSON.stringify(req.rid));
+
+    // Response helpers.
     res.badRequest = handleError(res, req, 400);
     res.unauthenticated = handleError(res, req, 401);
     res.unauthorized = handleError(res, req, 403);
     res.notFound = handleError(res, req, 404);
     res.serverError = handleError(res, req, 500);
     res.notAllowed = handleError(res, req, 405);
-    res.handle = handleResponse(res, req);
+    res.handleJSON = handleResponse(res, req);
+
     next();
+
+
   };
 
 }

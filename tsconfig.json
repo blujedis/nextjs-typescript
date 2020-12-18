@@ -6,6 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
+    "rootDir": ".",
     "baseUrl": "src",
     "allowJs": true,
     "skipLibCheck": true,
@@ -17,19 +18,26 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "downlevelIteration": true
   },
   "include": [
     "next-env.d.ts",
-    "src/**/*.{ts,tsx}"
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
     "src/**/*.js",
     "src/**/*.jsx",
+    "src/addons/_backups/**",
     "src/addons/antd/**",
     "src/addons/bulma/**",
+    "src/addons/chakra/**",
+    "src/addons/defaults/**",
+    "src/addons/evergreen/**",
     "src/addons/firebase/**",
-    "src/addons/nextauth/**"
+    "src/addons/nextauth/**",
+    "src/addons/styled-components/**"
   ]
 }

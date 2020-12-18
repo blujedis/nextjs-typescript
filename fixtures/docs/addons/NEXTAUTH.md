@@ -5,14 +5,8 @@ Adds painless authentication to your NextJs application.
 ## Install
 
 ```sh
-$ yarn add next-auth
+$ yarn addon next-auth
 ```
-
-```sh
-$ yarn add @types/next-auth -D
-```
-
-**Or simply run the install helper <code>yarn addon nextauth</code> to install.**
 
 ## Env Configuration
 
@@ -38,31 +32,16 @@ function Preflight({ children, pageProps}: PropsWithChildren<IApp>) {
 
   return (
     <NextProvider session={session}>
+      <StoreProvider>
+      <ProgressBar />
       {children}
+      </StoreProvider >
     </NextProvider>
   );
 
 }
 
 export default Preflight;
-```
-
-## Copy Api File
-
-Lastly you'll need to copy the file at [/src/addons/nextauth/api/[...nextauth].ts](/src/addons/nextauth/api/[...nextauth].ts) to the main **api** folder for next.
-
-The path you should end up with is [/src/pages/api/auth/[...nextauth].ts](/src/pages/api/auth/[...nextauth].ts).
-
-## Enable the Addon
-
-Go to your **package.json** file and and enable the addon.
-
-```json
-{
-  "addons": [
-    "nextauth"
-  ]
-}
 ```
 
 ## The Good Stuff

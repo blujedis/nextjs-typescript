@@ -123,7 +123,7 @@ export async function getServerSideAuthProps<P, Q extends ParsedUrlQuery = Parse
     err.stack = ''; // don't expose stack in production. 
 
   // If we have a redirect destination it's server side or is external.
-  if (destination && res && !referrer) {
+  if (destination && res && !referrer && auth.statusCode > 399) {
     res.setHeader('Location', formatRedirectUrl(destination, err));
     res.statusCode = destination.statusCode || 302;
     return result;

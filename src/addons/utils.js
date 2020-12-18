@@ -3,35 +3,26 @@ const { spawnSync } = require('child_process');
 const { magentaBright, redBright, yellowBright } = require('ansi-colors');
 const { removeSync, copySync, writeJSONSync, existsSync } = require('fs-extra');
 const globby = require('globby');
+const babelMerge = require('babel-merge');
 const { basename, relative, join } = require('path');
 const pkg = require('../../package.json');
 const tsconfig = require('../../tsconfig.json');
+const babelrc = require('../../.babelrc');
+const CWD = process.cwd();
 
 const addonNames = globby.sync('./src/addons', { onlyDirectories: true, deep: 1 }).map(d => d.split('/').pop());
 const tsExcludeTemplate = `src/addons/{{dir}}/**`;
 
-const packages = {
-  antd: {
-    dependencies: ['antd', 'less'],
-    devDependencies: ['@zeit/next-less', '@zeit/next-css', 'next-compose-plugins', 'less-vars-to-js'],
-    addMessage: `Don't forget to comment IN antd less style imports in ./src/pages/_app.tsx!`,
-  },
-  bulma: {
-    dependencies: ['bulma'],
-    devDependencies: ['node-sass@4.14.1'],
-    addMessage: `Don't forget to comment IN bulma style imports in ./src/pages/_app.tsx!`,
-  },
-  firebase: {
-    dependencies: ['firebase', 'firebase-admin', 'js-cookie', 'react-firebaseui'],
-    devDependencies: ['@types/js-cookie']
-  },
-  nextauth: {
-    dependencies: ['next-auth'],
-    devDependencies: ['@types/next-auth'],
-    addMessage: `Don't forget to comment IN next-auth imports in ./src/providers/index.tsx!`,
-    removeMessage: `Don't forget to comment OUT in ./src/providers/index.tsx!`
-  }
-};
+pkg.addons = { ...pkg.addons };
+pkg.addons.active = pkg.addons.active || [];
+
+const packages = addonNames.reduce((a, c) => {
+  if (c === '_backups' || c === 'backups')
+    return a;
+  // use func here may want to pass things in later.
+  a[c] = require(join(__dirname, c, 'config.js'))();
+  return a;
+}, {});
 
 const timestamp = (date = new Date()) => {
   const year = date.getFullYear();
@@ -41,67 +32,92 @@ const timestamp = (date = new Date()) => {
   return `${year}-${month}-${day}-${seconds}`;
 };
 
-const getDisabled = (addons = pkg.addons) => {
+const getDisabled = (addons = pkg.addons.active) => {
   return addonNames.filter(v => !addons.includes(v));
 };
 
 const cleanTsConfig = () => {
+
   const excludeGlobs = addonNames.map(n => tsExcludeTemplate.replace(`{{dir}}`, n));
+
   tsconfig.exclude = tsconfig.exclude.filter(v => !excludeGlobs.includes(v));
+
 };
 
 const getTsConfigDisabled = () => {
   return getDisabled().map(n => tsExcludeTemplate.replace(`{{dir}}`, n));
 };
 
-const updateTsConfig = () => {
+const updateTsConfig = (config = tsconfig, save = true) => {
+
   cleanTsConfig();
+
   const tsDisabled = getTsConfigDisabled();
-  tsconfig.exclude = [...tsconfig.exclude, ...tsDisabled]
+
+  config.exclude = [...config.exclude, ...tsDisabled];
+
+  if (save)
+    saveJSON(join(CWD, 'tsconfig.json'), config);
+
+  return config;
+
 };
+
+const runSpawn = (runCmd, args = [], options) => {
+
+  options = {
+    stdio: 'inherit',
+    ...options
+  };
+
+  args = args.flat().filter(v => v !== 'next-compose-plugins');
+
+  const rest = args.slice(1).join(' ');
+
+  console.log(`${magentaBright('addon')} running command "${runCmd + ' ' + args[0]} ${rest.trim()}"`);
+  spawnSync(runCmd, args, options);
+
+}
 
 const runner = (name, action) => {
 
   if (name === 'help')
     return;
 
-  const config = packages[name];
+  const config = packages[name] || {};
   const deps = config.dependencies || [];
   const devDeps = config.devDependencies || [];
+  const optDeps = config.optionalDependencies || [];
 
-  function runSpawn(runCmd, args = [], options, dev) {
-
-    if (typeof options === 'boolean') {
-      dev = options;
-      options = {};
-    }
-
-    options = {
-      stdio: 'inherit',
-      ...options
-    };
-
-    args = args.flat().filter(v => v !== 'next-compose-plugins');
-
-    // If removing remove versions from 
-    // package names. 
+  function cleanArgs(args = []) {
     if (action === 'remove')
-      args = args.map(a => {
-        a = a.split('@')[0];
+      return args.map(a => {
+        if (a.includes('@') && !/^@/.test(a))
+          a = a.split('@')[0];
         return a;
       });
-
-    // if (dev)
-    //   args.push('-D');
-
-    console.log(`${magentaBright('addon')} running command "${runCmd + ' ' + args[0]} ${args.slice(1).join(' ')}"`);
-    spawnSync(runCmd, args, options);
-
+    return args;
   }
 
   function run() {
-    runSpawn('yarn', [action, ...deps])
-    runSpawn('yarn', [action, ...devDeps], true)
+
+    const hasDeps = !!(deps || []).length;
+    const hasDevDeps = !!(devDeps || []).length;
+    const hsaOptDeps = !!(optDeps || []).length;
+
+    const depArgs = [action, ...cleanArgs(deps)];
+    const devArgs = [action, ...cleanArgs(devDeps)];
+    const optArgs = [action, ...cleanArgs(optDeps)];
+
+    if (hasDeps)
+      runSpawn('yarn', depArgs)
+
+    if (hasDevDeps)
+      runSpawn('yarn', devArgs);
+
+    if (hsaOptDeps)
+      runSpawn('yarn', optArgs);
+
   }
 
   return {
@@ -116,6 +132,10 @@ const copy = (src, dest, options) => {
 };
 
 const remove = (src) => {
+  // To be safe overwrite only don't remove.
+  const excluded = ['src/pages/_app.tsx', 'src/pages/_document.tsx', 'src/pages/_error.tsx', 'src/pages/404.tsx', 'src/pages/index.tsx', 'src/pages/index.ts'];
+  if (excluded.includes(src))
+    return;
   removeSync(src);
 };
 
@@ -131,7 +151,8 @@ const backup = (src) => {
   const segments = src.split('/');
   let dir = segments.find(s => addonNames.includes(s));
   dir = dir || 'other';
-  return copy(src, `./src/addons/backups/${dir}/${timestamp()}/${basename(src)}`);
+  const relPath = relative('src/pages', src);
+  return copy(src, `./src/addons/_backups/${dir}/${timestamp()}/${relPath}`);
 };
 
 const enableAddonFiles = (names = []) => {
@@ -208,14 +229,21 @@ const getExamplePaths = (validate = true) => {
 
 };
 
+const mergeBabelConfig = (obj1, obj2, opts) => {
+  return babelMerge(obj1, obj2, opts);
+}
+
 const saveJSON = (src, data, options) => {
   return writeJSONSync(src, data, { spaces: 2 });
 };
 
 module.exports = {
+  packages,
+  CWD,
   pkg,
+  babelrc,
   addonNames,
-  enabled: pkg.addons,
+  enabled: pkg.addons.active,
   tsconfig,
   packages,
   timestamp,
@@ -228,9 +256,11 @@ module.exports = {
   disableAddonFiles,
   cleanAddonFiles,
   getExamplePaths,
+  mergeBabelConfig,
   runner,
   copy,
   remove,
   backup,
-  saveJSON
+  saveJSON,
+  runSpawn
 };

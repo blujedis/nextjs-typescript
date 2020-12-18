@@ -16,16 +16,13 @@ const ProgressBar = dynamic(() => import('./progress'), { ssr: false });
 
 function Preflight(props: PropsWithChildren<IApp>) {
 
-  const { children, pageProps } = props;
-  const { session } = pageProps;
+  const { children } = props;
 
   return (
     <StoreProvider>
       <ProgressBar />
-      {/* <NextProvider session={session}> */}
       {children}
-      {/* </NextProvider> */}
-    </StoreProvider>
+    </StoreProvider >
   );
 
 }

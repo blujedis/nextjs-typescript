@@ -3,7 +3,7 @@ import { auth } from 'firebaseui';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 
-import initFirebase from '../init';
+import initFirebase from '../utils/init';
 import { setUserCookie } from '../utils/cookies';
 import { mapUser } from '../utils/helpers';
 

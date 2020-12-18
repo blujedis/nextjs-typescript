@@ -1,29 +1,11 @@
 # Firebase Addon
 
-Adds firebase authentication to your application.
+Adds firebase authentication to your application and connectivity to Firestore
 
 ## Install
 
 ```sh
-$ yarn add firebase firebase-admin js-cookie react-firebaseui
-```
-
-```sh
-$ yarn add @types/js-cookie -D
-```
-
-**Or simply run the install helper <code>yarn addon firebase</code> to install.**
-
-## Enable the Addon
-
-Go to your **package.json** file and and enable the addon.
-
-```json
-{
-  "addons": [
-    "firebase"
-  ]
-}
+$ yarn addon firebase
 ```
 
 ## The Good Stuff

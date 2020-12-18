@@ -1,17 +1,16 @@
-const { redBright, magentaBright, yellowBright } = require('ansi-colors');
+const { redBright, magentaBright, yellowBright, blueBright, stripColor } = require('ansi-colors');
 let argv = process.argv.slice(2);
 const cmd = argv.shift();
 const flags = argv.filter(v => ~v.indexOf('-'));
 argv = argv.filter(v => !~v.indexOf('-'));
-
 
 if (argv.length) {
   console.error(redBright(`\nAddons CLI does not support sub commands or multiple commands.\n`));
   process.exit();
 }
 
-const { runner, pkg, tsconfig, cleanTsConfig, remove,
-  addonNames, cleanAddonFiles, enableAddonFiles, saveJSON, getTsConfigDisabled, updateTsConfig } = require('./utils');
+const { runner, pkg, tsconfig, remove, packages, addonNames, cleanAddonFiles, babelrc,
+  enableAddonFiles, saveJSON, updateTsConfig, runSpawn, CWD, mergeBabelConfig } = require('./utils');
 
 const { join } = require('path');
 
@@ -19,38 +18,100 @@ const action = flags.includes('--remove') || flags.includes('-r') ? 'remove' : '
 
 const runnerInit = runner(cmd, action);
 
-console.log(cmd);
+let addonCommands = Object.keys(packages).reduce((a, c, i) => {
+  const config = packages[c];
+  return [...a, [`yarn addon ${c}`, config.description]];
+}, []);
+
+addonCommands = [
+  ...addonCommands,
+  [' ', ' '],
+  [blueBright('Command Utils:'), ' '],
+  ['yarn addon clean', 'cleans examples copied to pages dir.'],
+  ['yarn addon purge', 'purges all backups.'],
+  ['yarn addon doctor', 'ground zero resets everything.'],
+  ['yarn addon help', 'shows help menu.']
+];
+
+// need to get longest first column.
+const longest = addonCommands.reduce((a, c) => {
+  if (c[0].length > a)
+    return c[0].length;
+  return a;
+}, 0);
+
+addonCommands = addonCommands.map(v => {
+  const addCmd = v[0];
+  const addDesc = v[1];
+  const adj = longest - addCmd.length;
+  const prefix = stripColor(addCmd) === 'Command Utils:' ? '' : '  ';
+  return prefix + addCmd + ' '.repeat(adj) + ' '.repeat(6) + addDesc;
+});
 
 // Clean examples for non-enabled addons
 if (cmd === 'clean') {
-  const filtered = flags.includes('-a') || flags.includes('--all') ? addonNames : addonNames.filter(n => !pkg.addons.includes(n));
+  const filtered = flags.includes('-a') || flags.includes('--all') ? addonNames : addonNames.filter(n => !pkg.addons.active.includes(n));
   cleanAddonFiles(filtered);
+  updateTsConfig();
 }
+
+else if (cmd === 'build') {
+
+  // create a backup copy.
+  const clone = { ...tsconfig };
+  const backupPath = join(CWD, 'tsconfig.backup.json');
+  saveJSON(backupPath, clone);
+
+  tsconfig.exclude
+    .filter(v => !v.includes('examples'))
+    .push('src/pages/**/examples/**/*');
+
+  saveJSON(join(CWD, 'tsconfig.json'), tsconfig);
+
+  runSpawn('next', ['build']);
+
+  // Ensure we strip back out examples exclusion just to be safe.
+  clone.exclude = clone.exclude.filter(v => {
+    return !v.includes('examples');
+  });
+
+  saveJSON(backupPath, clone);
+
+  process.exit();
+
+}
+
+else if (cmd === 'doctor') {
+  cleanAddonFiles(addonNames);
+  remove('./src/addons/_backups');
+  updateTsConfig();
+  pkg.addons = pkg.addons || {};
+  delete pkg.addons.active;
+  pkg.addons.active = [];
+  saveJSON(join(CWD, 'package.json'), pkg);
+  enableAddonFiles('defaults');
+}
+
 // Removes all examples.
 else if (cmd === 'purge') {
-  remove('./src/addons/backups');
+  remove('./src/addons/_backups');
 }
 else if (cmd === 'help') {
+
   const help =
     `
+${blueBright('Next-Typescript Addons')}
 
-Next Addons
+${yellowBright('Basic configurations to assist in quickly spinning up or testing.')}
 
-Basic configurations to assist in quickly spinning up or testing.
+${blueBright('Commands:')}
+${addonCommands.join('\n')}
 
-Commands:
-  yarn addon antd           boilerplate and config for Antd.
-  yarn addon bulma          boilerplate for Bulma styling.
-  yarn addon firebase       sets up init and login using firebaseui.
-  yarn addon nextauth       basic config/setup for next-auth.
-  yarn addon clean          cleans examples copied to pages dir.
-  yarn addon purge          purges all backups.
-  yarn addon help           shows help menu.
-
-Flags:
+${yellowBright('Flags:')}
   --remove, -r        used with above command to remove install.
-  --all, -a           when present cleans all not just disabled.
   --clean, -c         when present cleans all when used with --remove.
+  --all, -a           used with yarn addon clean, cleans all not just disabled.
+  --optional, -o      when present installs optional dependencies.
 
 `;
   console.log(help);
@@ -59,25 +120,32 @@ else if (cmd && runnerInit) {
 
   const { run, config } = runnerInit;
 
-  pkg.addons = pkg.addons || [];
-
   let msg = '';
 
   if (action === 'add') {
-    pkg.addons = [...pkg.addons.filter(v => v !== cmd), cmd];
-    msg = config.addMessage;
+
+    pkg.addons.active = [...pkg.addons.active.filter(v => v !== cmd), cmd].filter(v => v !== 'defaults');
+
+    if (config.addMessage && !Array.isArray(config.addMessage))
+      config.addMessage = [config.addMessage];
+
+    msg = config.addMessage.join('\n');
+
   }
   else {
-    pkg.addons = pkg.addons.filter(v => v !== cmd);
 
-    msg = config.removeMessage;
+    pkg.addons.active = pkg.addons.active.filter(v => v !== cmd);
+
+    if (config.removeMessage && !Array.isArray(config.removeMessage))
+      config.removeMessage = [config.removeMessage];
+
+    msg = config.removeMessage.join('\n');
+
   }
 
   updateTsConfig();
 
-  saveJSON(join(process.cwd(), 'package.json'), pkg);
-
-  saveJSON(join(process.cwd(), 'tsconfig.json'), tsconfig);
+  saveJSON(join(CWD, 'package.json'), pkg);
 
   const actionText = action === 'remove' ? 'removing' : 'adding';
   console.log(`${magentaBright('addon')} ${actionText} ${cmd}`);
@@ -89,7 +157,14 @@ else if (cmd && runnerInit) {
       cleanAddonFiles(cmd);
   }
   else {
+    // Merge babel configuration.
+    if (config.babel) {
+      const newBabel = cmd === 'defaults' ? { ...babelrc, ...config.babel } : mergeBabelConfig(babelrc, config.babel)
+      saveJSON(join(CWD, '.babelrc.json'), newBabel);
+    }
+
     enableAddonFiles(cmd);
+
   }
 
   if (msg)
