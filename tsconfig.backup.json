@@ -18,7 +18,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "downlevelIteration": true
   },
   "include": [
     "next-env.d.ts",
@@ -29,11 +30,14 @@
     "node_modules",
     "src/**/*.js",
     "src/**/*.jsx",
-    "src/addons/antd/**",
+    "src/addons/_backups/**",
     "src/addons/bulma/**",
     "src/addons/chakra/**",
+    "src/addons/defaults/**",
+    "src/addons/emotion/**",
     "src/addons/evergreen/**",
     "src/addons/firebase/**",
-    "src/addons/nextauth/**"
+    "src/addons/nextauth/**",
+    "src/addons/styled-components/**"
   ]
 }

@@ -10,8 +10,6 @@ import { Provider as StoreProvider } from './store';
 import dynamic from 'next/dynamic';
 import { IApp } from 'types';
 
-// import { Provider as NextProvider } from 'next-auth/client';
-
 const ProgressBar = dynamic(() => import('./progress'), { ssr: false });
 
 function Preflight(props: PropsWithChildren<IApp>) {

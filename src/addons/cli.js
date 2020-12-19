@@ -4,15 +4,10 @@ const cmd = argv.shift();
 const flags = argv.filter(v => ~v.indexOf('-'));
 argv = argv.filter(v => !~v.indexOf('-'));
 
-if (argv.length) {
-  console.error(redBright(`\nAddons CLI does not support sub commands or multiple commands.\n`));
-  process.exit();
-}
-
-const { runner, pkg, tsconfig, remove, packages, addonNames, cleanAddonFiles, babelrc,
-  enableAddonFiles, saveJSON, updateTsConfig, runSpawn, CWD, mergeBabelConfig } = require('./utils');
+const { runner, pkg, tsconfig, remove, packages, addonNames, cleanAddonFiles, babelrc, restore, restorePoints, enableAddonFiles, saveJSON, updateTsConfig, runSpawn, CWD, mergeBabelConfig } = require('./utils');
 
 const { join } = require('path');
+const globby = require('globby');
 
 const action = flags.includes('--remove') || flags.includes('-r') ? 'remove' : 'add';
 
@@ -27,6 +22,7 @@ addonCommands = [
   ...addonCommands,
   [' ', ' '],
   [blueBright('Command Utils:'), ' '],
+  ['yarn addon restore', 'restores a previous backup by name, or type "previous".'],
   ['yarn addon clean', 'cleans examples copied to pages dir.'],
   ['yarn addon purge', 'purges all backups.'],
   ['yarn addon doctor', 'ground zero resets everything.'],
@@ -53,6 +49,19 @@ if (cmd === 'clean') {
   const filtered = flags.includes('-a') || flags.includes('--all') ? addonNames : addonNames.filter(n => !pkg.addons.active.includes(n));
   cleanAddonFiles(filtered);
   updateTsConfig();
+}
+
+if (cmd === 'restore') {
+
+  const restorePoint = argv[0] === 'previous' || !argv[0] ? restorePoints[0] : argv[0];
+
+  if (!restorePoints.includes(restorePoint)) {
+    console.error(redBright(`\nCannot restore using restore point of undefined.\n`));
+    process.exit();
+  }
+
+  restore(restorePoint);
+
 }
 
 else if (cmd === 'build') {
@@ -89,7 +98,7 @@ else if (cmd === 'doctor') {
   delete pkg.addons.active;
   pkg.addons.active = [];
   saveJSON(join(CWD, 'package.json'), pkg);
-  enableAddonFiles('defaults');
+  enableAddonFiles('defaults', { overwrite: true });
 }
 
 // Removes all examples.
@@ -116,7 +125,7 @@ ${yellowBright('Flags:')}
 `;
   console.log(help);
 }
-else if (cmd && runnerInit) {
+else if (cmd && addonNames.includes(cmd) && runnerInit) {
 
   const { run, config } = runnerInit;
 
@@ -163,7 +172,7 @@ else if (cmd && runnerInit) {
       saveJSON(join(CWD, '.babelrc.json'), newBabel);
     }
 
-    enableAddonFiles(cmd);
+    enableAddonFiles(cmd, null, true);
 
   }
 

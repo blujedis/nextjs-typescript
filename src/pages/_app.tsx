@@ -1,12 +1,10 @@
 import Providers from 'providers';
 import { IApp } from 'types';
-import { globalStyles } from 'addons/emotion/styles/theme';
 
 function App(props: IApp) {
   const { Component, pageProps, err } = props;
   return (
     <Providers {...props}>
-      {globalStyles}
       <Component err={err} {...pageProps} />
     </Providers>
   );

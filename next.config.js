@@ -3,6 +3,12 @@ const configurePlugins = require('./src/addons/next.plugins');
 const pkg = require('./package.json');
 const addonsConfig = pkg.addons;
 
+/////////////////////////////////////////////////////////////
+// NOTE: If you access webpack in your "addon"
+//       webpack some config keys/properties will
+//       be overwritten here as you'd expect.
+////////////////////////////////////////////////////////////
+
 const nextConfig = {
 
   // generateEtags: false,
@@ -31,14 +37,16 @@ const nextConfig = {
   // },
 
   // info contains: { buildId, dev, isServer, defaultLoaders, webpack }
-  webpack: (config, info) => {
+  webpack: (config, { dev }) => {
+    return config;
+  },
+
+  webpackDevMiddleware: (config) => {
     return config;
   }
 
-  // webpackDevMiddleware: (config) => {
-  //   return config;
-  // }
-
 };
 
-module.exports = configurePlugins(nextConfig);
+const config = configurePlugins(nextConfig);
+
+module.exports = config;

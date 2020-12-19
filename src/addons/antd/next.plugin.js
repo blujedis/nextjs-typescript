@@ -3,29 +3,26 @@
  * for this addon.
  */
 const withLess = require('@zeit/next-less');
-const withCss = require('@zeit/next-css');
-const themeVars = require('./styles/theme');
+// const withCss = require('@zeit/next-css');
+const lessToJS = require('less-vars-to-js');
+const { resolve } = require('path');
+const { readFileSync } = require('fs');
 
-// NOTE: if you wish to import your variables
-// you can do so with the below
-//
-// const themeVariables = require('less-vars-to-js')(fs.readFileSync(path.resolve('path/to/your/custom.less')));
-// set lessLoaderOptions.modifyVars to the above "themeVariables".
-//
-// Now you can use these vars in your project and also
-// have it automatically build out the theme as well.
+const themeVars = lessToJS(
+  readFileSync(resolve(process.cwd(), 'src/addons/antd/styles/variables.less'), 'utf8')
+);
 
 module.exports = (nextConfig) => {
 
-  const css = withCss({
-    cssModules: true, // Disable if you do NOT want css modules. Next forces modules out of box by default.
-    cssLoaderOptions: {
-      importLoaders: 1,
-      localIdentName: "[local]___[hash:base64:5]",
-    }
-  });
+  // const css = [withCss, {
+  //   cssModules: true, // Disable if you do NOT want css modules. Next forces modules out of box by default.
+  //   cssLoaderOptions: {
+  //     importLoaders: 1,
+  //     localIdentName: "[local]___[hash:base64:5]",
+  //   }
+  // }];
 
-  const less = withLess({
+  const less = [withLess, {
 
     lessLoaderOptions: {
       javascriptEnabled: true,
@@ -68,10 +65,8 @@ module.exports = (nextConfig) => {
 
     }
 
-  });
+  }];
 
-  const plugins = [css, less];
-
-  return { ...css, ...less };
+  return [less];
 
 };

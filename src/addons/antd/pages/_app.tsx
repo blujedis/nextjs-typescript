@@ -2,6 +2,7 @@ import Providers from 'providers';
 import { IApp } from 'types';
 
 import 'antd/dist/antd.less';
+import 'addons/antd/styles/theme.less';
 
 function App(props: IApp) {
   const { Component, pageProps, err } = props;

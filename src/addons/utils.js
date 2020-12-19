@@ -11,6 +11,9 @@ const babelrc = require('../../.babelrc');
 const CWD = process.cwd();
 
 const addonNames = globby.sync('./src/addons', { onlyDirectories: true, deep: 1 }).map(d => d.split('/').pop());
+
+const restorePoints = globby.sync('./src/addons/_backups', { onlyDirectories: true, deep: 1 }).reverse().map(d => d.split('/').pop());
+
 const tsExcludeTemplate = `src/addons/{{dir}}/**`;
 
 pkg.addons = { ...pkg.addons };
@@ -127,8 +130,10 @@ const runner = (name, action) => {
 
 };
 
-const copy = (src, dest, options) => {
-  copySync(src, dest, { overwrite: false })
+const copy = (src, dest, options = { overwrite: false }, bkup = false) => {
+  if (bkup)
+    backup(dest);
+  copySync(src, dest, options)
 };
 
 const remove = (src) => {
@@ -139,13 +144,22 @@ const remove = (src) => {
   removeSync(src);
 };
 
-const getAddonFiles = (name) => {
-  const excluded = [
-    `!./src/addons/${name}/pages/_app.tsx`,
-    `!./src/addons/${name}/pages/_document.tsx`,
-    `!./src/addons/${name}/pages/404.tsx`,
-    `!./src/addons/${name}/pages/_error.tsx`,
-  ];
+const restore = (src) => {
+  copy(`./src/addons/_backups/${n}`, './src/pages', { overwrite: true });
+};
+
+const getAddonFiles = (name, excluded = []) => {
+
+  // Exclude top level files as they are always required.
+  if (excluded === true) {
+    excluded = [
+      `!./src/addons/${name}/pages/_app.tsx`,
+      `!./src/addons/${name}/pages/_document.tsx`,
+      `!./src/addons/${name}/pages/404.tsx`,
+      `!./src/addons/${name}/pages/_error.tsx`,
+    ];
+  }
+
   return globby.sync([`./src/addons/${name}/pages`, ...excluded], { onlyFiles: true });
 };
 
@@ -154,18 +168,20 @@ const getPagesFiles = () => {
 }
 
 const backup = (src) => {
+  if (!existsSync(src))
+    return;
   const segments = src.split('/');
   let dir = segments.find(s => addonNames.includes(s));
-  dir = dir || 'other';
+  dir = dir || 'internal';
   const relPath = relative('src/pages', src);
-  return copy(src, `./src/addons/_backups/${dir}/${timestamp()}/${relPath}`);
+  return copy(src, `./src/addons/_backups/${timestamp()}-${dir}/${relPath}`);
 };
 
-const enableAddonFiles = (names = []) => {
+const enableAddonFiles = (names = [], options = { overwrite: false }, bkup = false) => {
   if (typeof names === 'string')
     names = [names];
   names.forEach(n => {
-    copy(`./src/addons/${n}/pages`, './src/pages');
+    copy(`./src/addons/${n}/pages`, './src/pages', options, bkup);
   });
 };
 
@@ -205,7 +221,8 @@ const getExamplePaths = (validate = true) => {
     const disabledPaths = getDisabled()
       .filter(v => v !== 'defaults')
       .reduce((a, c) => {
-        let files = getAddonFiles(c);
+        let files = getAddonFiles(c, true);
+        console.log
         let idx = null;
         if (files[0])
           idx = files[0].split('/').indexOf('pages') + 1;
@@ -265,6 +282,8 @@ module.exports = {
   cleanAddonFiles,
   getExamplePaths,
   mergeBabelConfig,
+  restorePoints,
+  restore,
   runner,
   copy,
   remove,
