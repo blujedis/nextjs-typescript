@@ -4,10 +4,9 @@ const cmd = argv.shift();
 const flags = argv.filter(v => ~v.indexOf('-'));
 argv = argv.filter(v => !~v.indexOf('-'));
 
-const { runner, pkg, tsconfig, remove, packages, addonNames, cleanAddonFiles, babelrc, restore, restorePoints, enableAddonFiles, saveJSON, updateTsConfig, runSpawn, CWD, mergeBabelConfig } = require('./utils');
+const { runner, pkg, tsconfig, remove, packages, addonNames, cleanAddonFiles, babelrc, restore, restorePoints, enableAddonFiles, saveJSON, updateTsConfig, runSpawn, CWD, mergeBabelConfig, create } = require('./utils');
 
 const { join } = require('path');
-const globby = require('globby');
 
 const action = flags.includes('--remove') || flags.includes('-r') ? 'remove' : 'add';
 
@@ -22,6 +21,7 @@ addonCommands = [
   ...addonCommands,
   [' ', ' '],
   [blueBright('Command Utils:'), ' '],
+  ['yarn addon create', `creates a new addon by name.`],
   ['yarn addon restore', 'restores a previous backup by name, or type "previous".'],
   ['yarn addon clean', 'cleans examples copied to pages dir.'],
   ['yarn addon purge', 'purges all backups.'],
@@ -88,6 +88,15 @@ else if (cmd === 'build') {
 
   process.exit();
 
+}
+
+else if (cmd === 'create') {
+
+  const name = argv.shift();
+  const deps = argv.map(v => "'" + v + "'").join(', ');
+  const installPath = create(name, deps);
+
+  console.log(yellowBright(`\nNew addon created at path ${installPath}.\n`));
 }
 
 else if (cmd === 'doctor') {

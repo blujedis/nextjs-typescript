@@ -1,7 +1,7 @@
 
 const { spawnSync } = require('child_process');
 const { magentaBright, redBright, yellowBright } = require('ansi-colors');
-const { removeSync, copySync, writeJSONSync, existsSync } = require('fs-extra');
+const { removeSync, copySync, writeJSONSync, existsSync, ensureDirSync, writeFileSync } = require('fs-extra');
 const globby = require('globby');
 const babelMerge = require('babel-merge');
 const { basename, relative, join } = require('path');
@@ -23,7 +23,9 @@ const packages = addonNames.reduce((a, c) => {
   if (c === '_backups' || c === 'backups')
     return a;
   // use func here may want to pass things in later.
-  a[c] = require(join(__dirname, c, 'config.js'))();
+  const reqPath = join(__dirname, c, 'config.js');
+  if (existsSync(reqPath))
+    a[c] = require(reqPath)();
   return a;
 }, {});
 
@@ -108,8 +110,12 @@ const runner = (name, action) => {
     const hasDevDeps = !!(devDeps || []).length;
     const hsaOptDeps = !!(optDeps || []).length;
 
+    const cleanDevDeps = cleanArgs(devDeps);
+    if (hasDevDeps.length)
+      cleanDevDeps.push('-D');
+
     const depArgs = [action, ...cleanArgs(deps)];
-    const devArgs = [action, ...cleanArgs(devDeps)];
+    const devArgs = [action, ...cleanDevDeps];
     const optArgs = [action, ...cleanArgs(optDeps)];
 
     if (hasDeps)
@@ -127,6 +133,44 @@ const runner = (name, action) => {
     config,
     run
   };
+
+};
+
+const create = (name, deps = '') => {
+
+  if (!name) {
+    console.error(redBright(`Cannot create addon using name of undefined.`));
+    process.exit();
+  }
+
+  const configTemplate = `
+module.exports = () => {
+
+  return {
+    description: 'installs addon ${name}.',
+    dependencies: [${deps}],
+    devDependencies: [],
+    persistDependencies: [],
+    babel: {
+      "presets": [
+        "next/babel"
+      ],
+      "plugins": []
+    },
+    addMessage: '',
+    removeMessage: ''
+  };
+
+};
+  `;
+
+  const basePath = `src/addons/${name}`;
+  const configPath = join(basePath, 'config.js');
+  ensureDirSync(join(process.cwd(), basePath, `pages/examples/${name}`));
+  // createFileSync(configPath)
+  writeFileSync(configPath, configTemplate);
+
+  return basePath;
 
 };
 
@@ -256,7 +300,7 @@ const getExamplePaths = (validate = true) => {
 
 const mergeBabelConfig = (obj1, obj2, opts) => {
   return babelMerge(obj1, obj2, opts);
-}
+};
 
 const saveJSON = (src, data, options) => {
   return writeJSONSync(src, data, { spaces: 2 });
@@ -283,6 +327,7 @@ module.exports = {
   getExamplePaths,
   mergeBabelConfig,
   restorePoints,
+  create,
   restore,
   runner,
   copy,
